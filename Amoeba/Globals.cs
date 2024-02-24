@@ -16,6 +16,7 @@ namespace Amoeba
         private static GraphicsDeviceManager graphics;
         private static Dictionary<string, Texture2D> gameTextures;
         private static GameTime gameTime;
+        private static SpriteFont spriteFont;
 
         //Properties:
         /// <summary>
@@ -25,6 +26,15 @@ namespace Amoeba
         {
             get { return sb; }
             set { sb = value; }
+        }
+
+        /// <summary>
+        /// Get/set access to a debug sprite font
+        /// </summary>
+        public static SpriteFont DebugFont
+        {
+            get { return spriteFont; }
+            set { spriteFont = value; }
         }
 
         /// <summary>

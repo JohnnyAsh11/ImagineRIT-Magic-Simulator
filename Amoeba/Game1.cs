@@ -34,6 +34,7 @@ namespace Amoeba
         protected override void LoadContent()
         {
             Globals.SB = new SpriteBatch(GraphicsDevice);
+            Globals.DebugFont = Content.Load<SpriteFont>("Arial40");
 
             Dictionary<string, Texture2D> gameTextures = new Dictionary<string, Texture2D>();
 

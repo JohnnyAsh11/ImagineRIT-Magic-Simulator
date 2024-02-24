@@ -22,6 +22,7 @@ namespace Amoeba
         private float speed;
         private KeyboardState prevKBState;
         private List<Seeker> seekers;
+        private int numOfSeekers;
         private Random rng;
         private bool isGrounded;
 
@@ -31,6 +32,11 @@ namespace Amoeba
         public event CollisionList GetCollidableTiles;
 
         //Properties:
+        public int NumOfSeekers
+        {
+            get { return numOfSeekers; }
+            set { numOfSeekers = value; }
+        }
 
         //Constructors:
         /// <summary>
@@ -52,7 +58,8 @@ namespace Amoeba
                 50);
             this.rng = new Random();
 
-            InstantiateSeekers(numOfSeekers);
+            this.numOfSeekers = numOfSeekers;
+            InstantiateSeekers(this.numOfSeekers);
         }
 
         //Methods:
@@ -64,7 +71,7 @@ namespace Amoeba
             //polling for key input
             KeyboardState kbState = Keyboard.GetState();
             Vectangle futurePosition = position;
-            isGrounded = false;
+            //isGrounded = false;
 
             //checking for up and down movement
             if (kbState.IsKeyDown(Keys.W))
@@ -94,6 +101,9 @@ namespace Amoeba
                 direction.X = 0;
             }
 
+            AttackInput(kbState);
+            ReloadSeekers(kbState);
+
             //direction = Vector2.Normalize(direction);
             futurePosition += (speed * direction);
 
@@ -102,10 +112,11 @@ namespace Amoeba
 
             if (!isGrounded)
             {
-                //futurePosition.Y -= Globals.Gravity;
+                futurePosition.Y -= Globals.Gravity;
             }
 
             position = futurePosition;
+            prevKBState = kbState;
 
             //updating the seekers
             UpdateSeekers();
@@ -121,6 +132,12 @@ namespace Amoeba
                 Globals.GameTextures["Pixel"],
                 position.ToRectangle,
                 Color.Blue);
+
+            Globals.SB.DrawString(
+                Globals.DebugFont,
+                $"{numOfSeekers}",
+                new Vector2(50, 50),
+                Color.Purple);
 
         }
 
@@ -145,10 +162,14 @@ namespace Amoeba
         {
             //updates the seeker's target position
             // and their Update logic
-            foreach (Seeker follower in seekers)
+            for (int i = seekers.Count - 1; i >= 0; i--)
             {
-                follower.Update();
-                follower.Target = this.position.Position;
+                if (seekers[i].Update())
+                {
+                    seekers.Remove(seekers[i]);
+                    continue;
+                }
+                seekers[i].Target = this.position.Position;
             }
         }
 
@@ -210,9 +231,36 @@ namespace Amoeba
             return futurePosition;
         }
 
-        private void AttackInput()
+        /// <summary>
+        /// Checks for the input necessary for attacking in game
+        /// </summary>
+        /// <param name="kbState">the key press polling variable</param>
+        private void AttackInput(KeyboardState kbState)
         {
+            //checks if the space bar was pressed and if there are still seekers to fire
+            if (kbState.IsKeyDown(Keys.Space) &&
+                prevKBState.IsKeyUp(Keys.LeftShift) &&
+                numOfSeekers > 0)
+            {
+                //is so, fire a seeker and decrement the number of remaining seekers
+                seekers[numOfSeekers - 1].Fired = true;
+                numOfSeekers--;
+            }
+        }
 
+        private void ReloadSeekers(KeyboardState kbState)
+        {
+            //the player cannot have more than 1000 seekers
+            if (numOfSeekers > 1000)
+            {
+                return;
+            }
+            else if (kbState.IsKeyDown(Keys.LeftShift) &&
+                    prevKBState.IsKeyUp(Keys.Space))
+            {
+                numOfSeekers++;
+                seekers.Add(new Seeker(rng));
+            }
         }
 
     }

@@ -26,6 +26,8 @@ namespace Amoeba
         private int windowHeight;
         private int windowWidth;
         private int seekScale;
+        private bool isFired;
+        private int fireTimer;
 
         //Properties:
         /// <summary>
@@ -35,6 +37,16 @@ namespace Amoeba
         {
             get { return  targetPosition; }
             set { targetPosition = value; }
+        }
+
+        public bool Fired
+        {
+            get { return isFired; }
+            set
+            {
+                position.Width += 40;
+                isFired = value; 
+            }
         }
 
         //Constructors:
@@ -59,30 +71,62 @@ namespace Amoeba
             this.mass = 1;
             this.acceleration = Vector2.Zero;
             this.seekScale = 10;
+            this.isFired = false;
+            this.fireTimer = 60;
         }
 
         //Methods:
         /// <summary>
         /// Per frame update method for the Seeker class
         /// </summary>
-        public void Update()
+        public bool Update()
         {
-            //reseting the acceleration
-            this.acceleration = Vector2.Zero;
-
-            if (Vector2.DistanceSquared(position.Position, targetPosition) > 50)
+            if (!isFired)
             {
-                seekScale = 40;
+                //reseting the acceleration
+                this.acceleration = Vector2.Zero;
+
+                if (Vector2.DistanceSquared(position.Position, targetPosition) > 50)
+                {
+                    seekScale = 40;
+                }
+
+                //applying a seek force to the center of the Host
+                this.ApplyForce(this.Seek(targetPosition) * seekScale);
+
+                //calculating the velocity
+                velocity = acceleration * Globals.DeltaTime;
+
+                //adding the velocity to the Vectangle position
+                position += velocity;
+
+                if (position.Y > targetPosition.Y)
+                {
+                    //this will have the seekers rain down
+                    //position.Y -= (position.Y + targetPosition.Y);
+
+                    //this will have all of the seekers form a horizontal line
+                    //position.Y -= (position.Y - targetPosition.Y);
+
+                    //magnetic fields effect
+                    position.Y += (targetPosition.Y / position.Y);
+                }
             }
+            else
+            {
+                //position.Height++;
 
-            //applying a seek force to the center of the Host
-            this.ApplyForce(this.Seek(targetPosition) * seekScale);
+                position.X += speed;
 
-            //calculating the velocity
-            velocity = acceleration * Globals.DeltaTime;
-
-            //adding the velocity to the Vectangle position
-            position += velocity;
+                //decrement the fire timer
+                fireTimer--;
+                if (fireTimer == 0)
+                {
+                    //when the timer reaches 0, return true to remove the object
+                    return true;
+                }
+            }
+            return false;
         }
 
         /// <summary>
