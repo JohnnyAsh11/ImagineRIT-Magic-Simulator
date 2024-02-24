@@ -14,7 +14,8 @@ namespace Amoeba
     public enum Tiles
     {
         Empty,
-        Collidable
+        Collidable,
+        Enemy
     }
 
     /// <summary>
@@ -109,7 +110,7 @@ namespace Amoeba
                         {
                             //create an enemy at the location
                             //this tile will likely also be empty behind the scenes
-                            tile = new Tile(Tiles.Empty, position);
+                            tile = new Tile(Tiles.Enemy, position);
                         }
 
                         //giving the array a reference to the tile

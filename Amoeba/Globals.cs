@@ -45,17 +45,26 @@ namespace Amoeba
             set { graphics = value; }
         }
 
+        /// <summary>
+        /// Get/set access to a reference to the GameTime variable
+        /// </summary>
         public static GameTime GameTime
         {
             get { return gameTime; }
             set { gameTime = value; }
         }
 
+        /// <summary>
+        /// Gravitational constant for the program
+        /// </summary>
         public static float Gravity
         {
             get { return -2.0f; }
         }
 
+        /// <summary>
+        /// Delta Time constant for the game
+        /// </summary>
         public static float DeltaTime
         {
             get { return (1.0f / 60.0f); }

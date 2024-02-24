@@ -37,9 +37,13 @@ namespace Amoeba
             {
                 this.color = Color.Black;
             }
-            if (tileType == Tiles.Collidable)
+            else if (tileType == Tiles.Collidable)
             {
                 this.color = Color.Blue;
+            }
+            else if (tileType == Tiles.Enemy)
+            {
+                this.color = Color.Red;
             }
         }
 
