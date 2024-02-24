@@ -9,6 +9,9 @@ using System.Threading.Tasks;
 
 namespace Amoeba
 {
+    /// <summary>
+    /// Physical object build to follow instantiations of the Host class 
+    /// </summary>
     public class Seeker
     {
 
@@ -23,20 +26,21 @@ namespace Amoeba
         private int windowHeight;
         private int windowWidth;
 
-
         //Properties:
+        /// <summary>
+        /// get/set access to the Vector2 target position
+        /// </summary>
         public Vector2 Target
         {
             get { return  targetPosition; }
             set { targetPosition = value; }
         }
 
-        public float Speed 
-        { 
-            set { speed = value; } 
-        }
-
         //Constructors:
+        /// <summary>
+        /// Parameterized constructor for the Seeker class
+        /// </summary>
+        /// <param name="rng">Random object used to determine the seeker's speed</param>
         public Seeker(Random rng)
         {
             windowHeight = Globals.Graphics.GraphicsDevice.Viewport.Height;
@@ -56,20 +60,27 @@ namespace Amoeba
         }
 
         //Methods:
+        /// <summary>
+        /// Per frame update method for the Seeker class
+        /// </summary>
         public void Update()
         {
+            const int seekScale = 40;
+
+            //reseting the acceleration
             this.acceleration = Vector2.Zero;
 
-            //targetPosition.X += rng.Next(-2, 3);
-            //targetPosition.Y += rng.Next(-2, 3);
+            //applying a seek force to the center of the Host
+            this.ApplyForce(this.Seek(targetPosition) * seekScale);
 
-            this.ApplyForce(this.Seek(targetPosition) * 40);
+            //calculating the velocity
+            velocity = acceleration * Globals.DeltaTime;
 
-            velocity = acceleration * (1.0f / 60.0f);
-
+            //adding the velocity to the Vectangle position
             position += velocity;
 
-
+            //calculating the screen bounds
+            //  top and bottom bounds
             if (position.Y > windowHeight)
             {
                 position.Y = windowHeight;
@@ -79,6 +90,7 @@ namespace Amoeba
                 position.Y = 0;
             }
 
+            //left and right bounds
             if (position.X > windowWidth)
             {
                 position.X = windowWidth;
@@ -89,6 +101,9 @@ namespace Amoeba
             }
         }
 
+        /// <summary>
+        /// per frame render method for the Seeker class
+        /// </summary>
         public void Draw()
         {
             Globals.SB.Draw(
@@ -97,6 +112,11 @@ namespace Amoeba
                 Color.White);
         }
 
+        /// <summary>
+        /// Calculates a seek steering force to the Host's position
+        /// </summary>
+        /// <param name="targetPosition">The Host's position</param>
+        /// <returns>a seeking force to the location</returns>
         private Vector2 Seek(Vector2 targetPosition)
         {
             Vector2 seekingForce;
@@ -114,7 +134,7 @@ namespace Amoeba
         /// <summary>
         /// Calculates the force based off of Newton's Second Law
         /// </summary>
-        /// <param name="force">Vector2 force being applied to the PhysObj</param>
+        /// <param name="force">Vector2 force being applied to the seeker's Acceleration vector</param>
         private void ApplyForce(Vector2 force)
         {
             acceleration += force / mass;

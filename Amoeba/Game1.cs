@@ -42,7 +42,7 @@ namespace Amoeba
 
             Globals.GameTextures = gameTextures;
 
-            player = new Host(1000);
+            player = new Host(5000);
             tileManager = new TileManager("../../../TestLevel.csv");
         }
 

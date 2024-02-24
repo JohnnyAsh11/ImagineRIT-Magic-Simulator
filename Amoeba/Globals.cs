@@ -56,6 +56,11 @@ namespace Amoeba
             get { return -2.0f; }
         }
 
+        public static float DeltaTime
+        {
+            get { return (1.0f / 60.0f); }
+        }
+
         //Methods: - NONE -
 
     }

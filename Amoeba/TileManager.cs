@@ -8,7 +8,9 @@ using System.Diagnostics;
 
 namespace Amoeba
 {
-
+    /// <summary>
+    /// Tracks the type of tile that is being created
+    /// </summary>
     public enum Tiles
     {
         Empty,
@@ -24,6 +26,7 @@ namespace Amoeba
         //Fields:
         private string filepath;
         private Tile[,] tiles;
+        private List<Tile> colliableTiles; 
         private int height;
         private int width;
 

@@ -23,6 +23,11 @@ namespace Amoeba
         //properties:
 
         //Constructors:
+        /// <summary>
+        /// Parameterized constructor for the Tiles of the game
+        /// </summary>
+        /// <param name="tileType">The tile's type</param>
+        /// <param name="position">The location that the tile is and it's size data</param>
         public Tile(Tiles tileType, Vectangle position)
         {
             this.tileType = tileType;
@@ -30,15 +35,18 @@ namespace Amoeba
 
             if (tileType == Tiles.Empty)
             {
-                this.color = Color.Purple;
+                this.color = Color.Black;
             }
             if (tileType == Tiles.Collidable)
             {
-                this.color = Color.Yellow;
+                this.color = Color.Blue;
             }
         }
 
         //Methods:
+        /// <summary>
+        /// Render method for the Tile class
+        /// </summary>
         public void Draw()
         {
             Globals.SB.Draw(

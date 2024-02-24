@@ -46,8 +46,8 @@ namespace Amoeba
             this.position = new Vectangle(
                 windowHeight / 2,
                 windowWidth / 2, 
-                5,
-                5);
+                50,
+                50);
             this.rng = new Random();
 
             wanderTimer = 0;
@@ -164,12 +164,16 @@ namespace Amoeba
         /// </summary>
         public void Draw()
         {
-            Globals.SB.Draw(
-                Globals.GameTextures["Pixel"],
-                position.ToRectangle,
-                Color.Blue);
+            Vectangle renderPos = position;
+            renderPos.X -= position.Width / 2;
+            renderPos.Y -= position.Height / 2;
 
             DrawSeekers();
+            Globals.SB.Draw(
+                Globals.GameTextures["Pixel"],
+                renderPos.ToRectangle,
+                Color.Blue);
+
         }
     }
 }
