@@ -19,10 +19,10 @@ namespace Amoeba
 
 
             //changing the window sizing to be our preferred size
-            Globals.Graphics.PreferredBackBufferWidth = 1600;
+            Globals.Graphics.PreferredBackBufferWidth = 1000;
             Globals.Graphics.PreferredBackBufferHeight = 1000;
 
-            Globals.Graphics.IsFullScreen = true;
+            //Globals.Graphics.IsFullScreen = true;
             Globals.Graphics.ApplyChanges();
         }
 
@@ -42,8 +42,10 @@ namespace Amoeba
 
             Globals.GameTextures = gameTextures;
 
-            player = new Host(5000);
+            player = new Host(500);
             tileManager = new TileManager("../../../TestLevel.csv");
+
+            player.GetCollidableTiles += tileManager.GetCollisionTiles;
         }
 
         protected override void Update(GameTime gameTime)

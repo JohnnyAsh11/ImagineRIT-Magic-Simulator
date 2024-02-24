@@ -59,7 +59,7 @@ namespace Amoeba
         /// </summary>
         public static float Gravity
         {
-            get { return -2.0f; }
+            get { return -3.0f; }
         }
 
         /// <summary>

@@ -21,6 +21,9 @@ namespace Amoeba
         private Color color;
 
         //properties:
+        public Tiles TileType { get { return tileType; } }
+
+        public Vectangle Position { get { return position; } }
 
         //Constructors:
         /// <summary>
@@ -39,7 +42,7 @@ namespace Amoeba
             }
             else if (tileType == Tiles.Collidable)
             {
-                this.color = Color.Blue;
+                this.color = Color.White;
             }
             else if (tileType == Tiles.Enemy)
             {

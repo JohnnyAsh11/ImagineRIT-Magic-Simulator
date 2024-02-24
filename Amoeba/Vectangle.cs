@@ -145,7 +145,7 @@ namespace Amoeba
 
         //Methods:
         /// <summary>
-        /// Checks if the FloatRectangle contains a point
+        /// Checks if the Vectangle contains a point
         /// </summary>
         /// <param name="location">Point being checked</param>
         /// <returns>Whether or not the Point is in the Vectangle</returns>
@@ -156,7 +156,7 @@ namespace Amoeba
         }
 
         /// <summary>
-        /// Checks if the FloatRectangle contains a Vector2
+        /// Checks if the Vectangle contains a Vector2
         /// </summary>
         /// <param name="location">Vector being checked</param>
         /// <returns>Whether or not the Point is in the Vectangle</returns>

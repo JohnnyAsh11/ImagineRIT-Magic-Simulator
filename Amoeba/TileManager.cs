@@ -18,6 +18,8 @@ namespace Amoeba
         Enemy
     }
 
+    public delegate List<Tile> CollisionList();
+
     /// <summary>
     /// Loads in a level created with a CSV file
     /// </summary>
@@ -27,25 +29,33 @@ namespace Amoeba
         //Fields:
         private string filepath;
         private Tile[,] tiles;
-        private List<Tile> colliableTiles; 
         private int height;
         private int width;
+        private List<Tile> collisionTiles;
+        private int levelCounter;
 
         //properties:
+        public int Level { get { return levelCounter; } }
 
 
         //Constructors:
         public TileManager(string filepath)
         {
             this.filepath = filepath;
-            tiles = null;
+            this.tiles = null;
             this.height = 0;
             this.width = 0;
+            this.collisionTiles = new List<Tile>();
+            this.levelCounter = 1;
 
             LoadLevel();
+            FindCollisionTiles();
         }
 
         //Methods:
+        /// <summary>
+        /// Loads all of the level data from a CSV filepath
+        /// </summary>
         private void LoadLevel()
         {
             StreamReader reader = null!;
@@ -152,19 +162,64 @@ namespace Amoeba
         public void NextLevel(string filepath)
         {
             this.filepath = filepath;
-            this.LoadLevel();
+            this.levelCounter++;
+            
+            //creating the next level
+            LoadLevel();
+
+            //gathering the collision data for that level
+            FindCollisionTiles();
         }
 
-
+        /// <summary>
+        /// Render method for the TileManager class
+        /// </summary>
         public void Draw()
         {
+            //looping through the rows and cols of the array
             for (int row = 0; row < height; row++)
             {
                 for (int col = 0; col < width; col++)
                 {
+                    //calling the tile's draw method
                     tiles[row, col].Draw();
                 }
             }
         }
+
+        /// <summary>
+        /// Collects all the tiles that the Host would need for collision detection
+        /// </summary>
+        /// <returns>a list full of the currently collidable tiles</returns>
+        private List<Tile> FindCollisionTiles()
+        {
+            collisionTiles.Clear();
+
+            //looping through the rows and cols of the array
+            for (int row = 0; row < height; row++)
+            {
+                for (int col = 0; col < width; col++)
+                {
+                    //if the tile at that index is collidable
+                    if (tiles[row, col].TileType == Tiles.Collidable)
+                    {
+                        //add it to the list
+                        collisionTiles.Add(tiles[row, col]);
+                    }
+                }
+            }
+
+            return collisionTiles;
+        }
+
+        /// <summary>
+        /// Method used primarily for the collision event system
+        /// </summary>
+        /// <returns>the list of collidable tiles</returns>
+        public List<Tile> GetCollisionTiles()
+        {
+            return collisionTiles;
+        }
+
     }
 }

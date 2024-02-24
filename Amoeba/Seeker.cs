@@ -25,6 +25,7 @@ namespace Amoeba
         private Random rng;
         private int windowHeight;
         private int windowWidth;
+        private int seekScale;
 
         //Properties:
         /// <summary>
@@ -57,6 +58,7 @@ namespace Amoeba
             this.velocity = new Vector2(1, 1);
             this.mass = 1;
             this.acceleration = Vector2.Zero;
+            this.seekScale = 10;
         }
 
         //Methods:
@@ -65,10 +67,13 @@ namespace Amoeba
         /// </summary>
         public void Update()
         {
-            const int seekScale = 40;
-
             //reseting the acceleration
             this.acceleration = Vector2.Zero;
+
+            if (Vector2.DistanceSquared(position.Position, targetPosition) > 50)
+            {
+                seekScale = 40;
+            }
 
             //applying a seek force to the center of the Host
             this.ApplyForce(this.Seek(targetPosition) * seekScale);
@@ -78,27 +83,6 @@ namespace Amoeba
 
             //adding the velocity to the Vectangle position
             position += velocity;
-
-            //calculating the screen bounds
-            //  top and bottom bounds
-            if (position.Y > windowHeight)
-            {
-                position.Y = windowHeight;
-            }
-            else if (position.Y < 0)
-            {
-                position.Y = 0;
-            }
-
-            //left and right bounds
-            if (position.X > windowWidth)
-            {
-                position.X = windowWidth;
-            }
-            else if (position.X < 0)
-            {
-                position.X = 0;
-            }
         }
 
         /// <summary>
@@ -106,10 +90,15 @@ namespace Amoeba
         /// </summary>
         public void Draw()
         {
+            //defining the position for the seekers to be rendered as centered on the host
+            Vectangle renderPos = position;
+            renderPos.X += 25;
+            renderPos.Y += 25;
+
             Globals.SB.Draw(
                 Globals.GameTextures["Pixel"],
-                position.ToRectangle,
-                Color.White);
+                renderPos.ToRectangle,
+                Color.Red);            
         }
 
         /// <summary>
