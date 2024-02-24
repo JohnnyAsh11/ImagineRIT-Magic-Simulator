@@ -9,6 +9,7 @@ namespace Amoeba
     {
 
         private Host player;
+        private TileManager tileManager;
 
         public Game1()
         {
@@ -42,6 +43,7 @@ namespace Amoeba
             Globals.GameTextures = gameTextures;
 
             player = new Host(1000);
+            tileManager = new TileManager("../../../TestLevel.csv");
         }
 
         protected override void Update(GameTime gameTime)
@@ -55,7 +57,6 @@ namespace Amoeba
 
             player.Update();
 
-
             base.Update(gameTime);
         }
 
@@ -65,6 +66,7 @@ namespace Amoeba
 
             Globals.SB.Begin();
 
+            tileManager.Draw();
             player.Draw();
 
             Globals.SB.End();
