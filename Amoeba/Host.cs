@@ -7,6 +7,7 @@ using Microsoft.Xna.Framework.Graphics;
 using System.Text;
 using System.Threading.Tasks;
 using System.IO;
+using System.Text.RegularExpressions;
 
 namespace Amoeba
 {
@@ -25,6 +26,11 @@ namespace Amoeba
         private int numOfSeekers;
         private Random rng;
         private bool isGrounded;
+
+        private Vector2 acceleration;
+        private Vector2 velocity;
+        private float wanderAngle;
+        private float wanderTimer;
 
         private int windowHeight;
         private int windowWidth;
@@ -58,6 +64,10 @@ namespace Amoeba
                 50);
             this.rng = new Random();
 
+            velocity = Vector2.Zero;
+            this.wanderTimer = 0;
+            wanderAngle = (float)(rng.NextDouble() * (Math.PI * 2));
+
             this.numOfSeekers = numOfSeekers;
             InstantiateSeekers(this.numOfSeekers);
         }
@@ -72,6 +82,8 @@ namespace Amoeba
             KeyboardState kbState = Keyboard.GetState();
             Vectangle futurePosition = position;
             //isGrounded = false;
+
+            acceleration = Vector2.Zero;
 
             //checking for up and down movement
             if (kbState.IsKeyDown(Keys.W))
@@ -105,15 +117,26 @@ namespace Amoeba
             ReloadSeekers(kbState);
 
             //direction = Vector2.Normalize(direction);
-            futurePosition += (speed * direction);
+            ApplyForce(Wander(2f, 1f));
+
+            velocity += acceleration;
+
+            velocity = Vector2.Clamp(
+                velocity, 
+                Vector2.Zero, 
+                new Vector2(speed, speed));
+
+            //futurePosition += velocity;
+            futurePosition += (direction * speed);
 
             //factoring collisions into the future position
             futurePosition = CollisionDetection(futurePosition);
 
-            if (!isGrounded)
-            {
-                futurePosition.Y -= Globals.Gravity;
-            }
+            //checking if the host is on the ground
+            //if (!isGrounded)
+            //{
+            //    //futurePosition.Y -= Globals.Gravity;
+            //}
 
             position = futurePosition;
             prevKBState = kbState;
@@ -128,19 +151,17 @@ namespace Amoeba
         public void Draw()
         {
             DrawSeekers();
-            Globals.SB.Draw(
-                Globals.GameTextures["Pixel"],
-                position.ToRectangle,
-                Color.Blue);
+            //Globals.SB.Draw(
+            //    Globals.GameTextures["Pixel"],
+            //    position.ToRectangle,
+            //    Color.Red);
 
-            Globals.SB.DrawString(
-                Globals.DebugFont,
-                $"{numOfSeekers}",
-                new Vector2(50, 50),
-                Color.Purple);
-
+            //Globals.SB.DrawString(
+            //    Globals.DebugFont,
+            //    $"{numOfSeekers}",
+            //    new Vector2(50, 50),
+            //    Color.Purple);
         }
-
 
         /// <summary>
         /// Creates the seeker objects that will follow the Host
@@ -164,11 +185,17 @@ namespace Amoeba
             // and their Update logic
             for (int i = seekers.Count - 1; i >= 0; i--)
             {
+                //checking if the seeker's time is up
                 if (seekers[i].Update())
                 {
+                    //if it is, remove the reference to it
                     seekers.Remove(seekers[i]);
+
+                    //move to the next iteration
                     continue;
                 }
+
+                //setting the target to the host's current position
                 seekers[i].Target = this.position.Position;
             }
         }
@@ -178,8 +205,10 @@ namespace Amoeba
         /// </summary>
         private void DrawSeekers()
         {
+            //looping through the list of seekers
             foreach (Seeker seeker in seekers)
             {
+                //calls the seeker's individual draw methods
                 seeker.Draw();
             }
         }
@@ -199,13 +228,13 @@ namespace Amoeba
                 Vector2 left = new Vector2(position.X, position.Y + (position.Height / 2));
                 Vector2 right = new Vector2(position.X + position.Width, position.Y + (position.Height / 2));
 
-
                 //invoking the event
                 collidables = GetCollidableTiles();
 
                 //looping through the values in the event
                 foreach (Tile tile in collidables)
                 {
+                    //Checking if the tile's position contains any of the Vector2s
                     if (tile.Position.ToRectangle.Contains(top))
                     {
                         futurePosition.Y += speed;
@@ -220,8 +249,14 @@ namespace Amoeba
                     }
                     else if (tile.Position.ToRectangle.Contains(bottom))
                     {
+                        //if the bottom is within the tile's position
+                        //perform the same actions
                         futurePosition.Y -= speed;
+
+                        //also stop the direction vector in the Y direction
                         direction.Y = 0;
+
+                        //let the rest of class know that the host is on the ground
                         isGrounded = true;
                         break;
                     }
@@ -248,6 +283,10 @@ namespace Amoeba
             }
         }
 
+        /// <summary>
+        /// Method for the Seeker reload input
+        /// </summary>
+        /// <param name="kbState">The key press polling variable</param>
         private void ReloadSeekers(KeyboardState kbState)
         {
             //the player cannot have more than 1000 seekers
@@ -258,9 +297,91 @@ namespace Amoeba
             else if (kbState.IsKeyDown(Keys.LeftShift) &&
                     prevKBState.IsKeyUp(Keys.Space))
             {
+                //increase the number of seekers
                 numOfSeekers++;
+
+                //add the seekers to the list
                 seekers.Add(new Seeker(rng));
             }
+        }
+
+
+        /// <summary>
+        /// Calculates a random Wander force to be applied to the Agent 
+        /// </summary>
+        /// <param name="time">How far ahead the future Position will calculate</param>
+        /// <param name="radius">The radius of the Wander Algorithm's circle</param>
+        /// <returns>A wander force for the Agent</returns>
+        protected Vector2 Wander(float time, float radius)
+        {
+            //finding the location of the projected wander circle
+            Vector2 futurePosition = CalcFuturePosition(time);
+
+            //every 2 seconds, getting a random point on the circle to wander to
+            wanderTimer += Globals.DeltaTime;
+            if (wanderTimer >= .1)
+            {
+                wanderAngle = (float)(rng.NextDouble() * (Math.PI * 2));
+                wanderTimer = 0;
+            }
+
+            //calculating the x and y position of the point on the circle
+            float x = (float)(futurePosition.X + Math.Cos(wanderAngle) * radius);
+            float y = (float)(futurePosition.Y + Math.Sin(wanderAngle) * radius);
+
+            //seeking the point found
+            return Seek(new Vector2(x, y));
+        }
+
+        /// <summary>
+        /// Calculates the future position of the Agent based on its current
+        /// Velocity Vector
+        /// </summary>
+        /// <param name="time">Amound of frames ahead</param>
+        /// <returns>The future position of the Agent</returns>
+        protected Vector2 CalcFuturePosition(float time)
+        {
+            Vector2 futurePosition = Vector2.Zero;
+
+            //getting the future position by getting the current position and
+            // adding velecity to it multplied by time
+            futurePosition = (position.Position + velocity) * time;
+
+            return futurePosition;
+        }
+
+        /// <summary>
+        /// The Seek Force calculation method
+        /// </summary>
+        /// <param name="targetPosition">The position of the object being seeked</param>
+        /// <returns>An approiate force to seek that object</returns>
+        private Vector2 Seek(Vector2 targetPosition)
+        {
+            //declaring the variable that will hold our seeking force
+            Vector2 seekingForce;
+
+            //calculating the vector that would point to the desired location
+            Vector2 desiredVelocity = targetPosition - position.Position;
+
+            //normalizing that and multiplying it buy the maxSpeed of this physics agent
+            desiredVelocity = Vector2.Normalize(desiredVelocity) * speed;
+
+            //performing desiredVelocity - velocity to retrieve a vector force that will
+            // smoothly track closer and closer to the desired velocity every frame that 
+            // this method is called
+            seekingForce = desiredVelocity - velocity;
+
+            return seekingForce;
+        }
+
+
+        /// <summary>
+        /// Calculates the force based off of Newton's Second Law
+        /// </summary>
+        /// <param name="force">Vector2 force being applied to the seeker's Acceleration vector</param>
+        private void ApplyForce(Vector2 force)
+        {
+            acceleration += force / 1;
         }
 
     }

@@ -43,7 +43,7 @@ namespace Amoeba
 
             Globals.GameTextures = gameTextures;
 
-            player = new Host(500);
+            player = new Host(10000);
             tileManager = new TileManager("../../../TestLevel.csv");
 
             player.GetCollidableTiles += tileManager.GetCollisionTiles;

@@ -28,6 +28,7 @@ namespace Amoeba
         private int seekScale;
         private bool isFired;
         private int fireTimer;
+        private Color color;
 
         //Properties:
         /// <summary>
@@ -45,6 +46,7 @@ namespace Amoeba
             set
             {
                 position.Width += 40;
+                color = Color.Fuchsia;
                 isFired = value; 
             }
         }
@@ -60,7 +62,7 @@ namespace Amoeba
             windowWidth = Globals.Graphics.GraphicsDevice.Viewport.Width;
 
             this.rng = rng;
-            this.speed = (float)(rng.NextDouble() * 100) + 30;
+            this.speed = (float)((rng.NextDouble() * 100) + 30);
             this.targetPosition = Vector2.Zero;
             this.position = new Vectangle(
                 windowWidth / 2,
@@ -70,9 +72,13 @@ namespace Amoeba
             this.velocity = new Vector2(1, 1);
             this.mass = 1;
             this.acceleration = Vector2.Zero;
-            this.seekScale = 10;
+
+            //this.seekScale = 10;
+            this.seekScale = 40;
+
             this.isFired = false;
             this.fireTimer = 60;
+            this.color = Color.Red;
         }
 
         //Methods:
@@ -88,8 +94,22 @@ namespace Amoeba
 
                 if (Vector2.DistanceSquared(position.Position, targetPosition) > 50)
                 {
-                    seekScale = 40;
+                    //seekScale = 40;
+                    seekScale = 5;
+
+
+                    //seekScale = 40;
                 }
+                else
+                {
+                    seekScale = 150;
+
+
+                    //seekScale = 400;
+                }
+
+                //targetPosition.X += rng.Next(-2, 3);
+                //targetPosition.Y += rng.Next(-2, 3);
 
                 //applying a seek force to the center of the Host
                 this.ApplyForce(this.Seek(targetPosition) * seekScale);
@@ -104,12 +124,32 @@ namespace Amoeba
                 {
                     //this will have the seekers rain down
                     //position.Y -= (position.Y + targetPosition.Y);
-
+                    
                     //this will have all of the seekers form a horizontal line
                     //position.Y -= (position.Y - targetPosition.Y);
 
                     //magnetic fields effect
                     position.Y += (targetPosition.Y / position.Y);
+                }
+                if (position.X > targetPosition.X)
+                {
+                    //Create loop-de-loops around the top left and bottom right of the host
+                    //  mix with the magnetic fields
+                    //Alone it makes a vertical line
+                    //position.X -= (targetPosition.X / position.X);
+
+                    //time glass effect?
+                    //position.X += (targetPosition.X / position.X);
+                    //position.X += (position.X / targetPosition.X);
+
+                    //more cool fly from the left effects
+                    //position.X -= targetPosition.X;
+
+                    //Flys in from the left
+                    //position.X -= (position.X + targetPosition.X);
+
+                    //Fly in from the left but cooler
+                    //position.X /= (position.X + targetPosition.X);
                 }
             }
             else
@@ -142,7 +182,7 @@ namespace Amoeba
             Globals.SB.Draw(
                 Globals.GameTextures["Pixel"],
                 renderPos.ToRectangle,
-                Color.Red);            
+                color);            
         }
 
         /// <summary>
