@@ -34,6 +34,7 @@ namespace MakhaNata_Magic
 
         protected override void Update(GameTime gameTime)
         {
+            Globals.GameTime = gameTime;
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed ||
                 Keyboard.GetState().IsKeyDown(Keys.Escape))
             {

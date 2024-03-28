@@ -1,9 +1,6 @@
-﻿using Microsoft.Xna.Framework.Input;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
 
 namespace MakhaNata_Magic
 {
@@ -11,6 +8,7 @@ namespace MakhaNata_Magic
     {
 
         //Fields:
+        private float timer;
 
         //Properties:
 
@@ -18,15 +16,42 @@ namespace MakhaNata_Magic
         public Seeker()
             : base()
         {
-            
+            timer = 0;
         }
 
         //Methods:
         public override void CalcSteeringForces()
         {
-            totalForce += Wander(2, 2) * 0.1f;
-            totalForce += Flock(SeekerManager.Instance.Seekers);
-            //totalForce += KeepInBounds();
+            MouseState mState = Mouse.GetState();
+
+            float distance = Vector2.DistanceSquared(position.Position, mState.Position.ToVector2());
+
+            //150 squared is 22500, so were checking distance against the squared range
+            if (distance < 22500)
+            {
+                color = Color.Blue;
+                timer = 0;
+
+                totalForce += Seek(mState.Position.ToVector2());
+            }
+            else
+            {
+                timer += Globals.GameTime.TotalGameTime.Milliseconds;
+
+                if (timer < 4000)
+                {
+                    color = Color.Red;
+
+                    totalForce += Wander(2, 2) * 0.1f;
+                    //totalForce += Flock(SeekerManager.Instance.Seekers);
+                    //totalForce += KeepInBounds();
+                }
+                else if (timer >= 4)
+                {
+                    totalForce += Flock(SeekerManager.Instance.Seekers);
+                }
+            }
+
             ScreenWrap();
         }
 

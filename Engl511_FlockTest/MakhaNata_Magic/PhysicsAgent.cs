@@ -88,7 +88,7 @@ namespace MakhaNata_Magic
             velocity += acceleration;
 
             //applying the velocity to the position
-            position.Position += velocity * 5;
+            position.Position += velocity;
         }
 
         /// <summary>
@@ -249,7 +249,7 @@ namespace MakhaNata_Magic
         /// <returns>The Vector3 force to the center of the flock</returns>
         private Vector2 Cohesion(List<PhysicsAgent> collection)
         {
-            float maxDistance = 250f;
+            float maxDistance = (float)(Math.Pow(250, 2));
             int inRangeAgents = 0;
             Vector2 cohesionForce = Vector2.Zero;
 
@@ -258,7 +258,7 @@ namespace MakhaNata_Magic
             {
                 //calculate the distance between this agents position to the other
                 // agent positions
-                float distance = Vector2.Distance(
+                float distance = Vector2.DistanceSquared(
                     position.Position,
                     agent.Position.Position);
 
@@ -299,7 +299,7 @@ namespace MakhaNata_Magic
         /// <returns>a force that moves together with other aligned agents</returns>
         private Vector2 Alignment(List<PhysicsAgent> collection)
         {
-            float maxDistance = 250f;
+            float maxDistance = (float)(Math.Pow(250, 2));
             int inRangeAgents = 0;
             Vector2 alignDirection = Vector2.Zero;
 
@@ -308,7 +308,7 @@ namespace MakhaNata_Magic
             {
 
                 //calculating the distance between this agent and the other agents
-                float distance = Vector2.Distance(
+                float distance = Vector2.DistanceSquared(
                     Position.Position,
                     agent.Position.Position);
 
