@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.7.34009.444
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MakhaNata_Magic", "MakhaNata_Magic.csproj", "{7D01398F-D362-44CF-A658-4C1D04730400}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{7D01398F-D362-44CF-A658-4C1D04730400}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7D01398F-D362-44CF-A658-4C1D04730400}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7D01398F-D362-44CF-A658-4C1D04730400}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7D01398F-D362-44CF-A658-4C1D04730400}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {2BD8FCA6-15A5-4404-A2F4-56BF0C7C85B9}
+	EndGlobalSection
+EndGlobal

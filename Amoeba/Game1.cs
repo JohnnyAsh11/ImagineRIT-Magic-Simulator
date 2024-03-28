@@ -2,6 +2,7 @@
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using System.Collections.Generic;
+using PerlinGenerator;
 
 namespace Amoeba
 {
@@ -10,6 +11,11 @@ namespace Amoeba
 
         private Host player;
         private TileManager tileManager;
+        private Noise noiseGenerator;
+
+        private List<Vector2> positions;
+        private float xPos;
+        private float offset;
 
         public Game1()
         {
@@ -43,10 +49,14 @@ namespace Amoeba
 
             Globals.GameTextures = gameTextures;
 
-            player = new Host(10000);
-            tileManager = new TileManager("../../../TestLevel.csv");
+            player = new Host(500);
+            //tileManager = new TileManager("../../../TestLevel.csv");
+            noiseGenerator = new Noise();
+            positions = new List<Vector2>();
+            xPos = 0;
+            offset = 25;
 
-            player.GetCollidableTiles += tileManager.GetCollisionTiles;
+            //player.GetCollidableTiles += tileManager.GetCollisionTiles;
         }
 
         protected override void Update(GameTime gameTime)
@@ -58,7 +68,18 @@ namespace Amoeba
             }
             Globals.GameTime = gameTime;
 
-            player.Update();
+            float yPos = (float)(noiseGenerator.NextNoise()) + offset;
+            xPos += 1;
+
+            if (xPos > Globals.Graphics.GraphicsDevice.Viewport.Width)
+            {
+                xPos = 0;
+                offset += 25;
+            }
+
+            positions.Add(new Vector2(xPos, yPos));
+
+            //player.Update();
 
             base.Update(gameTime);
         }
@@ -69,8 +90,15 @@ namespace Amoeba
 
             Globals.SB.Begin();
 
-            tileManager.Draw();
-            player.Draw();
+            for (int i = 0; i < positions.Count; i++)
+            {
+                Globals.SB.Draw(
+                    Globals.GameTextures["Pixel"],
+                    positions[i],
+                    Color.White);
+            }
+            //tileManager.Draw();
+            //player.Draw();
 
             Globals.SB.End();
 
