@@ -42,7 +42,7 @@ namespace MakhaNata_Magic
         /// Default constructor for PhysicsAgents
         /// </summary>
         public PhysicsAgent()
-            : base(Globals.GameTextures["Pixel"], new Vectangle(200, 200, 1, 1))
+            : base(Globals.GameTextures["Pixel"], new Vectangle(200, 200, 2, 2))
         {
             mass = 1;
             maxSpeed = 5;
@@ -132,10 +132,12 @@ namespace MakhaNata_Magic
         /// </summary>
         protected void ScreenWrap()
         {
+            //setting some variables on the stack to reduce property calls
             Vector2 position = this.position.Position;
             int width = Globals.Graphics.GraphicsDevice.Viewport.Width;
             int height = Globals.Graphics.GraphicsDevice.Viewport.Height;
 
+            //checking the X wrapping
             if (position.X > width)
             {
                 this.position.X = 0;
@@ -145,6 +147,7 @@ namespace MakhaNata_Magic
                 this.position.X = width;
             }
 
+            //checking the Y wrapping
             if (position.Y > height)
             {
                 this.position.Y = 0;
@@ -379,7 +382,7 @@ namespace MakhaNata_Magic
         {
             Vector2 flockForce = Vector2.Zero;
 
-            flockForce += Cohesion(collection) * .3f;
+            flockForce += Cohesion(collection) * .4f;
             flockForce += Alignment(collection) * .2f;
             flockForce += Separate(collection) * .4f;
 
