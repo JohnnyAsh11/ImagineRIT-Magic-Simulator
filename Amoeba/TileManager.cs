@@ -32,6 +32,8 @@ namespace Amoeba
         private int height;
         private int width;
         private List<Tile> collisionTiles;
+
+
         private int levelCounter;
 
         //properties:
