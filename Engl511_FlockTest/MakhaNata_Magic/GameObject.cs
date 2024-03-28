@@ -11,6 +11,7 @@ namespace MakhaNata_Magic
         //Fields:
         protected Texture2D asset;
         protected Vectangle position;
+        protected Color color;
 
         //Properties:
         /// <summary>
@@ -32,6 +33,7 @@ namespace MakhaNata_Magic
         {
             this.position = position;
             this.asset = asset;
+            this.color = Color.White;
         }
 
         //Methods:
@@ -48,7 +50,7 @@ namespace MakhaNata_Magic
             Globals.SB.Draw(
                 asset,
                 position.ToRectangle,
-                Color.White);
+                color);
         }
     }
 }

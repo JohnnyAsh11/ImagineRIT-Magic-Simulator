@@ -46,7 +46,7 @@ namespace MakhaNata_Magic
         {
             seekers = new List<PhysicsAgent>();
             
-            for (int i = 0; i < 200; i++) 
+            for (int i = 0; i < 100; i++) 
             { 
                 seekers.Add(new Seeker());
             }

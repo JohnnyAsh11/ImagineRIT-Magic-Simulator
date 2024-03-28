@@ -18,6 +18,7 @@ namespace MakhaNata_Magic
         private static SpriteBatch spriteBatch;
         private static GraphicsDeviceManager graphics;
         private static Dictionary<string, Texture2D> gameTextures;
+        private static GameTime gameTime;
 
         //Properties:
         /// <summary>
@@ -45,6 +46,15 @@ namespace MakhaNata_Magic
         {
             get { return gameTextures; }
             set { gameTextures = value; }
+        }
+
+        /// <summary>
+        /// Get/set access to a reference of GameTime
+        /// </summary>
+        public static GameTime GameTime
+        {
+            get { return gameTime; }
+            set { gameTime = value; }
         }
 
         //Methods: - NONE -
