@@ -88,7 +88,7 @@ namespace MakhaNata_Magic
             velocity += acceleration;
 
             //applying the velocity to the position
-            position.Position += velocity;
+            position.Position += velocity * 2;
         }
 
         /// <summary>

@@ -11,8 +11,6 @@ namespace MakhaNata_Magic
         public Game1()
         {
             Globals.Graphics = new GraphicsDeviceManager(this);
-            Globals.Graphics.IsFullScreen = true;
-
             Content.RootDirectory = "Content";
             IsMouseVisible = true;
         }
