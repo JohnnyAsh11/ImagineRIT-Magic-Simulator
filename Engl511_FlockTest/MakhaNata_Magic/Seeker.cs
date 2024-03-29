@@ -42,7 +42,7 @@ namespace MakhaNata_Magic
             }
             if (kbState.IsKeyDown(Keys.S))
             {
-                height += 2s5;
+                height += 25;
             }
 
 
