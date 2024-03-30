@@ -23,7 +23,6 @@ namespace Amoeba
             Content.RootDirectory = "Content";
             IsMouseVisible = true;
 
-
             //changing the window sizing to be our preferred size
             Globals.Graphics.PreferredBackBufferWidth = 1000;
             Globals.Graphics.PreferredBackBufferHeight = 1000;

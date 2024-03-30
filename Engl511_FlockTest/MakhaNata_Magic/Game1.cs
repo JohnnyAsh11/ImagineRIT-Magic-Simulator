@@ -13,6 +13,13 @@ namespace MakhaNata_Magic
             Globals.Graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
             IsMouseVisible = true;
+
+            //changing the window sizing to be our preferred size
+            //Globals.Graphics.PreferredBackBufferWidth = 800;
+            //Globals.Graphics.PreferredBackBufferHeight = 800;
+            
+            //Globals.Graphics.IsFullScreen = true;
+            //Globals.Graphics.ApplyChanges();
         }
 
         protected override void Initialize()

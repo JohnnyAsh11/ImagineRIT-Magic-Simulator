@@ -11,7 +11,7 @@ namespace MakhaNata_Magic
         private uint width;
         private uint height;
 
-        //Properties:
+        //Properties: - NONE -
 
         //Constructors:
         public Seeker()
@@ -28,24 +28,6 @@ namespace MakhaNata_Magic
             MouseState mState = Mouse.GetState();
             float distance = Vector2.DistanceSquared(position.Position, mState.Position.ToVector2());
 
-            if (kbState.IsKeyDown(Keys.W))
-            {
-                height -= 25;
-            }
-            if (kbState.IsKeyDown(Keys.D))
-            {
-                width += 25;
-            }
-            if (kbState.IsKeyDown(Keys.A))
-            {
-                width -= 25;
-            }
-            if (kbState.IsKeyDown(Keys.S))
-            {
-                height += 25;
-            }
-
-
             //position.X += rng.Next(-2, 3);
             //position.Y += rng.Next(-2, 3);
 
@@ -53,7 +35,7 @@ namespace MakhaNata_Magic
             if (distance < 22500)
             {
                 //setting the color to blue
-                color = Color.Blue;
+                color = Color.Purple;
 
                 //Adding the seek force towards the mouse to the total force
                 totalForce += Seek(mState.Position.ToVector2());
@@ -61,10 +43,12 @@ namespace MakhaNata_Magic
             else
             {
                 //setting the color to red
-                color = Color.Red;
+                color = Color.Yellow;
 
                 //adding the wander force to the totalforce
                 totalForce += Wander(2, 2) * 0.3f;
+
+                //totalForce += Flock(SeekerManager.Instance.Seekers);
             }
 
             //seeking the center of the screen
@@ -72,6 +56,7 @@ namespace MakhaNata_Magic
 
             //allowing the pixel boids to wrap
             ScreenWrap();
+            //totalForce += KeepInBounds();
         }
 
     }

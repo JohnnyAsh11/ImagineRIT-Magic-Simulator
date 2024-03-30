@@ -88,7 +88,7 @@ namespace MakhaNata_Magic
             velocity += acceleration;
 
             //applying the velocity to the position
-            position.Position += velocity * 2;
+            position.Position += velocity;
         }
 
         /// <summary>
@@ -382,7 +382,7 @@ namespace MakhaNata_Magic
         {
             Vector2 flockForce = Vector2.Zero;
 
-            flockForce += Cohesion(collection) * .4f;
+            flockForce += Cohesion(collection) * .3f;
             flockForce += Alignment(collection) * .2f;
             flockForce += Separate(collection) * .4f;
 
