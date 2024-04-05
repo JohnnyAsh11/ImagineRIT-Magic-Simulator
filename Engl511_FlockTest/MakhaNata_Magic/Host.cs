@@ -20,11 +20,14 @@ namespace MakhaNata_Magic
         //Properties:
 
         //Constructors:
+        /// <summary>
+        /// Default constructor for the Host class
+        /// </summary>
         public Host()
             : base()
         {
+            //creating the seekers
             seekers = new List<PhysicsAgent>();
-
             GenerateSeekers(500);
 
             //apending the Seeker update method onto the PhysicsAgent update method
@@ -32,20 +35,30 @@ namespace MakhaNata_Magic
         }
 
         //Methods:
+        /// <summary>
+        /// Generates an amount of seekers equal to the amount parameter
+        /// </summary>
+        /// <param name="amount">the amount of seekers being generated</param>
         private void GenerateSeekers(int amount)
         {
             Seeker newSeeker = null;
 
             for (uint i = 0; i < amount; i++)
             {
+                //creating the seeker
                 newSeeker = new Seeker();
-
+                
+                //subscribing the GiveLocation event to the Seeker's OnSeekHost event
                 newSeeker.OnSeekHost += this.GiveLocation;
 
+                //adding the seeker to the list
                 seekers.Add(newSeeker);
             }
         }
 
+        /// <summary>
+        /// Overriding to contain the specific
+        /// </summary>
         public override void CalcSteeringForces()
         {
             totalForce += Wander(1, 5) * 1.5f;
