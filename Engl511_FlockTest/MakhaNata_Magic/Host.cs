@@ -39,7 +39,7 @@ namespace MakhaNata_Magic
             totalForce += Wander(3, 1);
         }
 
-        public override void UpdateSeekers()
+        public void UpdateSeekers()
         {
             foreach (PhysicsAgent agent in seekers)
             {
