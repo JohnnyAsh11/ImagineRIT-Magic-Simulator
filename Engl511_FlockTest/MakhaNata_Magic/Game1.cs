@@ -8,6 +8,8 @@ namespace MakhaNata_Magic
     public class Game1 : Game
     {
 
+        private List<Host> hosts;
+
         public Game1()
         {
             Globals.Graphics = new GraphicsDeviceManager(this);
@@ -15,11 +17,11 @@ namespace MakhaNata_Magic
             IsMouseVisible = true;
 
             //changing the window sizing to be our preferred size
-            //Globals.Graphics.PreferredBackBufferWidth = 800;
-            //Globals.Graphics.PreferredBackBufferHeight = 800;
+            Globals.Graphics.PreferredBackBufferWidth = 800;
+            Globals.Graphics.PreferredBackBufferHeight = 800;
             
             //Globals.Graphics.IsFullScreen = true;
-            //Globals.Graphics.ApplyChanges();
+            Globals.Graphics.ApplyChanges();
         }
 
         protected override void Initialize()
@@ -37,6 +39,13 @@ namespace MakhaNata_Magic
             gameTextures["Pixel"].SetData<Color>(new Color[1] { Color.White });
 
             Globals.GameTextures = gameTextures;
+
+            hosts = new List<Host>();
+
+            for (uint i = 0; i < 20; i++)
+            {
+                hosts.Add(new Host());
+            }
         }
 
         protected override void Update(GameTime gameTime)
@@ -48,7 +57,10 @@ namespace MakhaNata_Magic
                 Exit();
             }
 
-            SeekerManager.Instance.Update();
+            foreach (Host host in hosts)
+            {
+                host.Update();
+            }
 
             base.Update(gameTime);
         }
@@ -58,7 +70,10 @@ namespace MakhaNata_Magic
             GraphicsDevice.Clear(Color.Black);
 
             Globals.SB.Begin();
-            SeekerManager.Instance.Draw();
+            foreach (Host host in hosts)
+            {
+                host.Draw();
+            }
             Globals.SB.End();
 
             base.Draw(gameTime);

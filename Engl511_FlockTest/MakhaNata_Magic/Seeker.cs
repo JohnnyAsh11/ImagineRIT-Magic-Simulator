@@ -4,12 +4,16 @@ using Microsoft.Xna.Framework.Input;
 
 namespace MakhaNata_Magic
 {
+    public delegate Vector2 GetLocation();
+
     public class Seeker : PhysicsAgent
     {
 
         //Fields:
         private uint width;
         private uint height;
+
+        public event GetLocation OnSeekHost;
 
         //Properties: - NONE -
 
@@ -35,7 +39,7 @@ namespace MakhaNata_Magic
             if (distance < 22500)
             {
                 //setting the color to blue
-                color = Color.Purple;
+                color = Color.Blue;
 
                 //Adding the seek force towards the mouse to the total force
                 totalForce += Seek(mState.Position.ToVector2());
@@ -43,7 +47,7 @@ namespace MakhaNata_Magic
             else
             {
                 //setting the color to red
-                color = Color.Yellow;
+                color = Color.Red;
 
                 //adding the wander force to the totalforce
                 totalForce += Wander(2, 2) * 0.3f;
@@ -51,8 +55,12 @@ namespace MakhaNata_Magic
                 //totalForce += Flock(SeekerManager.Instance.Seekers);
             }
 
-            //seeking the center of the screen
-            totalForce += Seek(new Vector2(width / 2, height / 2)) * .15f;
+            //so long as the OnSeekHost event has methods subscribed to it
+            if (OnSeekHost != null)
+            {
+                //seek the point that is returned
+                totalForce += Seek(OnSeekHost()) * .15f;
+            }
 
             //allowing the pixel boids to wrap
             ScreenWrap();

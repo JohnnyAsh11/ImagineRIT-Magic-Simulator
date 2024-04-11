@@ -7,6 +7,8 @@ using System.Reflection.Metadata.Ecma335;
 
 namespace MakhaNata_Magic
 {
+    public delegate void UpdateMethod();
+
     /// <summary>
     /// Acts as an equivalent to the GameObject class but applies physics properties to the objects
     /// </summary>
@@ -26,6 +28,8 @@ namespace MakhaNata_Magic
         private float wanderAngle;
 
         protected Random rng;
+
+        protected event UpdateMethod OnPhysicsUpdate;
 
         //Properties:
         /// <summary>
@@ -89,6 +93,13 @@ namespace MakhaNata_Magic
 
             //applying the velocity to the position
             position.Position += velocity;
+
+            //Checking if the child class has appended anything to the Method
+            if (OnPhysicsUpdate != null)
+            {
+                //if so, invoke the child's update methods.
+                OnPhysicsUpdate();
+            }
         }
 
         /// <summary>
