@@ -5,10 +5,23 @@ using System.Collections.Generic;
 
 namespace MakhaNata_Magic
 {
+    /// <summary>
+    /// Tracks the states of the simulation
+    /// </summary>
+    public enum SimState
+    {
+        Menu,
+        Simulation,
+        Pause
+    }
+
+
     public class Game1 : Game
     {
 
         private List<Host> hosts;
+
+        private SimState simState;
 
         public Game1()
         {
@@ -27,6 +40,8 @@ namespace MakhaNata_Magic
         protected override void Initialize()
         {
             base.Initialize();
+
+            simState = SimState.Menu;
         }
 
         protected override void LoadContent()
@@ -42,7 +57,7 @@ namespace MakhaNata_Magic
 
             hosts = new List<Host>();
 
-            for (uint i = 0; i < 20; i++)
+            for (uint i = 0; i < 1; i++)
             {
                 hosts.Add(new Host());
             }
@@ -50,11 +65,38 @@ namespace MakhaNata_Magic
 
         protected override void Update(GameTime gameTime)
         {
+            KeyboardState kbState = Keyboard.GetState();
+
             Globals.GameTime = gameTime;
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed ||
-                Keyboard.GetState().IsKeyDown(Keys.Escape))
+                kbState.IsKeyDown(Keys.Escape))
             {
                 Exit();
+            }
+
+            switch (simState)
+            {
+                case SimState.Menu:
+
+                    //Updates for the Menu state
+
+                    if (kbState.IsKeyDown(Keys.Space))
+                    {
+                        simState = SimState.Simulation;
+                    }
+
+                    break;
+                case SimState.Simulation:
+
+                    //Updates for the simulation state
+
+                    break;
+                case SimState.Pause:
+
+                    //updates for the pause state
+
+                    break;
+
             }
 
             foreach (Host host in hosts)
