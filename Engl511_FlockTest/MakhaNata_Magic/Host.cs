@@ -28,7 +28,7 @@ namespace MakhaNata_Magic
         {
             //creating the seekers
             seekers = new List<PhysicsAgent>();
-            GenerateSeekers(1000);
+            GenerateSeekers(500);
 
             //apending the Seeker update method onto the PhysicsAgent update method
             this.OnPhysicsUpdate += UpdateSeekers;

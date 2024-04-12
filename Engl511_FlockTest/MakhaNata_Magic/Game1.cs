@@ -2,6 +2,7 @@
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using System.Collections.Generic;
+using System.Diagnostics;
 
 namespace MakhaNata_Magic
 {
@@ -22,6 +23,7 @@ namespace MakhaNata_Magic
         private List<Host> hosts;
 
         private SimState simState;
+        private KeyboardState prevKBState;
 
         public Game1()
         {
@@ -57,7 +59,7 @@ namespace MakhaNata_Magic
 
             hosts = new List<Host>();
 
-            for (uint i = 0; i < 1; i++)
+            for (uint i = 0; i < 10; i++)
             {
                 hosts.Add(new Host());
             }
@@ -78,9 +80,8 @@ namespace MakhaNata_Magic
             {
                 case SimState.Menu:
 
-                    //Updates for the Menu state
-
-                    if (kbState.IsKeyDown(Keys.Space))
+                    //polling for input to a state change
+                    if (SingleKeyPress(kbState, Keys.Enter))
                     {
                         simState = SimState.Simulation;
                     }
@@ -89,21 +90,37 @@ namespace MakhaNata_Magic
                 case SimState.Simulation:
 
                     //Updates for the simulation state
+                    foreach (Host host in hosts)
+                    {
+                        host.Update();
+                    }
+
+                    //polling for input into a state change
+                    if (SingleKeyPress(kbState, Keys.Enter))
+                    {
+                        simState = SimState.Pause;
+                    }
 
                     break;
                 case SimState.Pause:
 
-                    //updates for the pause state
+                    //polling for input
+                    if (SingleKeyPress(kbState, Keys.Enter))
+                    {
+                        //if enter was pressed, return to the sim
+                        simState = SimState.Simulation;
+                    }
+                    else if (SingleKeyPress(kbState, Keys.Space))
+                    {
+                        //if space was pressed, return to the main menu
+                        simState = SimState.Menu;
+                    }
 
                     break;
 
             }
 
-            foreach (Host host in hosts)
-            {
-                host.Update();
-            }
-
+            prevKBState = kbState;
             base.Update(gameTime);
         }
 
@@ -112,13 +129,42 @@ namespace MakhaNata_Magic
             GraphicsDevice.Clear(Color.Black);
 
             Globals.SB.Begin();
-            foreach (Host host in hosts)
+
+            switch (simState)
             {
-                host.Draw();
+                case SimState.Menu:
+
+
+
+                    break;
+                case SimState.Simulation:
+
+                    foreach (Host host in hosts)
+                    {
+                        host.Draw();
+                    }
+
+                    break;
+                case SimState.Pause:
+
+
+
+                    break;
             }
             Globals.SB.End();
 
             base.Draw(gameTime);
+        }
+
+        /// <summary>
+        /// Checks for a single key press from the user
+        /// </summary>
+        /// <param name="kbState">The current iteration's keyboard state</param>
+        /// <param name="key">the key being checked</param>
+        /// <returns>Whether or not a single press of the key occurred</returns>
+        private bool SingleKeyPress(KeyboardState kbState, Keys key)
+        {
+            return kbState.IsKeyDown(key) && prevKBState.IsKeyUp(key);
         }
     }
 }
