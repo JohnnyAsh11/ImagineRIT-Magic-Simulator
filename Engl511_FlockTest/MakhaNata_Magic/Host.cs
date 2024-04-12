@@ -30,6 +30,10 @@ namespace MakhaNata_Magic
             seekers = new List<PhysicsAgent>();
             GenerateSeekers(500);
 
+            //Randomizing the position of the Hosts
+            position.X = rng.Next(0, Globals.Graphics.GraphicsDevice.Viewport.Width + 1);
+            position.Y = rng.Next(0, Globals.Graphics.GraphicsDevice.Viewport.Height + 1);
+
             //apending the Seeker update method onto the PhysicsAgent update method
             this.OnPhysicsUpdate += UpdateSeekers;
         }
@@ -46,7 +50,7 @@ namespace MakhaNata_Magic
             for (uint i = 0; i < amount; i++)
             {
                 //creating the seeker
-                newSeeker = new Seeker();
+                newSeeker = new Seeker(position.X, position.Y);
                 
                 //subscribing the GiveLocation event to the Seeker's OnSeekHost event
                 newSeeker.OnSeekHost += this.GiveLocation;

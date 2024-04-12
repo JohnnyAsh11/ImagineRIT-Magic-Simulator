@@ -24,6 +24,15 @@ namespace MakhaNata_Magic
             width = (uint)Globals.Graphics.GraphicsDevice.Viewport.Width;
             height = (uint)Globals.Graphics.GraphicsDevice.Viewport.Height;
         }
+        public Seeker(float x, float y)
+            : base()
+        {
+            position.X = x;
+            position.Y = y;
+
+            width = (uint)Globals.Graphics.GraphicsDevice.Viewport.Width;
+            height = (uint)Globals.Graphics.GraphicsDevice.Viewport.Height;
+        }
 
         //Methods:
         public override void CalcSteeringForces()

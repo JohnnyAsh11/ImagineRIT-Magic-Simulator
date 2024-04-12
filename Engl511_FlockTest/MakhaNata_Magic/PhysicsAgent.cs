@@ -58,9 +58,6 @@ namespace MakhaNata_Magic
             startingPosition = new Vector2(
                 position.X,
                 position.Y);
-
-            position.X += rng.Next(-100, 101);
-            position.Y += rng.Next(-100, 101);
         }
 
 

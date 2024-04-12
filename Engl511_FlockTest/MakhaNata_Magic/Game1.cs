@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 
@@ -24,6 +25,7 @@ namespace MakhaNata_Magic
 
         private SimState simState;
         private KeyboardState prevKBState;
+        private SpriteFont simFont;
 
         public Game1()
         {
@@ -31,12 +33,8 @@ namespace MakhaNata_Magic
             Content.RootDirectory = "Content";
             IsMouseVisible = true;
 
-            //changing the window sizing to be our preferred size
-            Globals.Graphics.PreferredBackBufferWidth = 800;
-            Globals.Graphics.PreferredBackBufferHeight = 800;
-            
-            //Globals.Graphics.IsFullScreen = true;
-            Globals.Graphics.ApplyChanges();
+            Window.AllowUserResizing = true;
+            Window.ClientSizeChanged += OnResize;
         }
 
         protected override void Initialize()
@@ -49,6 +47,9 @@ namespace MakhaNata_Magic
         protected override void LoadContent()
         {
             Globals.SB = new SpriteBatch(GraphicsDevice);
+
+            //loading the font
+            simFont = Content.Load<SpriteFont>("BungeeSpice");
 
             Dictionary<string, Texture2D> gameTextures = new Dictionary<string, Texture2D>();
 
@@ -134,7 +135,16 @@ namespace MakhaNata_Magic
             {
                 case SimState.Menu:
 
-
+                    Globals.SB.DrawString(
+                        simFont, 
+                        "Hilael Blood Magic Simulator", 
+                        Vector2.Zero, 
+                        Color.Blue, 
+                        0.0f, 
+                        Vector2.Zero, 
+                        1.0f,
+                        SpriteEffects.None,
+                        0.0f);
 
                     break;
                 case SimState.Simulation:
@@ -165,6 +175,17 @@ namespace MakhaNata_Magic
         private bool SingleKeyPress(KeyboardState kbState, Keys key)
         {
             return kbState.IsKeyDown(key) && prevKBState.IsKeyUp(key);
+        }
+
+        public void OnResize(Object sender, EventArgs e)
+        {
+            if ((Globals.Graphics.PreferredBackBufferWidth != Globals.Graphics.GraphicsDevice.Viewport.Width) ||
+                (Globals.Graphics.PreferredBackBufferHeight != Globals.Graphics.GraphicsDevice.Viewport.Height))
+            {
+                Globals.Graphics.PreferredBackBufferWidth = Globals.Graphics.GraphicsDevice.Viewport.Width;
+                Globals.Graphics.PreferredBackBufferHeight = Globals.Graphics.GraphicsDevice.Viewport.Height;
+                Globals.Graphics.ApplyChanges();
+            }
         }
     }
 }
