@@ -10,6 +10,14 @@ using Microsoft.Xna.Framework.Input;
 namespace MakhaNata_Magic
 {
     /// <summary>
+    /// Used to determine what spell the player is casting
+    /// </summary>
+    public enum Spell
+    {
+
+    }
+
+    /// <summary>
     /// Player controlled class that serves as the focus point for Seekers
     /// </summary>
     public class Host : PhysicsAgent
