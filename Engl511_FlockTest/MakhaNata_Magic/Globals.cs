@@ -57,7 +57,11 @@ namespace MakhaNata_Magic
             set { gameTime = value; }
         }
 
-        //Methods: - NONE -
+        /// <summary>
+        /// Gets the value for the time in between frames (1/60)
+        /// </summary>
+        public static float DeltaTime { get { return 0.166f; } }
 
+        //Methods: - NONE -
     }
 }

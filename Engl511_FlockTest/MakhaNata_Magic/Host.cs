@@ -14,7 +14,11 @@ namespace MakhaNata_Magic
     /// </summary>
     public enum Spell
     {
-
+        Yashmi,     //Protection Spell      Input: A, LeftTrigger, RightTrigger, Y
+        Hushumi,    //Basic Attack Spell
+        Jasica,     //Healing Spell
+        Yuruq,      //Burning Spell
+        Hiduun      //Nuetral roaming state
     }
 
     /// <summary>
@@ -24,8 +28,17 @@ namespace MakhaNata_Magic
     {
         //Fields:
         private List<PhysicsAgent> seekers;
+        private Spell currentSpell;
 
         //Properties:
+        /// <summary>
+        /// Get/set property for the Host's current spell
+        /// </summary>
+        public Spell CurrentSpell
+        {
+            get { return currentSpell; }
+            set { currentSpell = value; }
+        }
 
         //Constructors:
         /// <summary>
@@ -34,6 +47,9 @@ namespace MakhaNata_Magic
         public Host()
             : base()
         {
+            //setting the Host to the roaming state
+            currentSpell = Spell.Hiduun;
+
             //creating the seekers
             seekers = new List<PhysicsAgent>();
             GenerateSeekers(500);
@@ -73,23 +89,51 @@ namespace MakhaNata_Magic
         /// </summary>
         public override void CalcSteeringForces()
         {
-            totalForce += Wander(1, 5) * 1.5f;
-            totalForce += KeepInBounds();
+            switch (currentSpell)
+            {
+                case Spell.Hiduun:
+
+                    //adding he physics steering algorithms necessary for the Hiduun state
+                    totalForce += Wander(1, 5) * 1.5f;
+                    totalForce += KeepInBounds();
+
+                    break;
+                case Spell.Yashmi:
+                    break;
+                case Spell.Hushumi:
+                    break;
+                case Spell.Jasica:
+                    break;
+                case Spell.Yuruq:
+                    break;
+            }
         }
 
+        /// <summary>
+        /// Updates the seekers found within the Host
+        /// </summary>
         public void UpdateSeekers()
         {
+            //for every Seeker
             foreach (PhysicsAgent agent in seekers)
             {
+                //update it
                 agent.Update();
             }
         }
 
+        /// <summary>
+        /// Host's implementation of per frame render method
+        /// </summary>
         public override void Draw()
         {
+            //draws the seekers
             DrawSeekers();
         }
 
+        /// <summary>
+        /// private helper method to render the seekers
+        /// </summary>
         private void DrawSeekers()
         {
             //drawing all of the seekers
@@ -99,6 +143,10 @@ namespace MakhaNata_Magic
             }
         }
 
+        /// <summary>
+        /// Gives a copy of the Host's position for events
+        /// </summary>
+        /// <returns>The Host's Vector2 position</returns>
         private Vector2 GiveLocation()
         {
             return position.Position;

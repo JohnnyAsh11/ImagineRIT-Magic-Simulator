@@ -39,30 +39,12 @@ namespace MakhaNata_Magic
         {
             KeyboardState kbState = Keyboard.GetState();
             MouseState mState = Mouse.GetState();
-            float distance = Vector2.DistanceSquared(position.Position, mState.Position.ToVector2());
 
-            //position.X += rng.Next(-2, 3);
-            //position.Y += rng.Next(-2, 3);
+            //setting the color to red
+            color = Color.Red;
 
-            //150 squared is 22500, so were checking distance against the squared range
-            if (distance < 22500)
-            {
-                //setting the color to blue
-                color = Color.Blue;
-
-                //Adding the seek force towards the mouse to the total force
-                totalForce += Seek(mState.Position.ToVector2());
-            }
-            else
-            {
-                //setting the color to red
-                color = Color.Red;
-
-                //adding the wander force to the totalforce
-                totalForce += Wander(2, 2) * 0.3f;
-
-                //totalForce += Flock(SeekerManager.Instance.Seekers);
-            }
+            //adding the wander force to the totalforce
+            totalForce += Wander(2, 2) * 0.3f;
 
             //so long as the OnSeekHost event has methods subscribed to it
             if (OnSeekHost != null)
@@ -72,7 +54,7 @@ namespace MakhaNata_Magic
             }
 
             //allowing the pixel boids to wrap
-            ScreenWrap();
+            //ScreenWrap();
             //totalForce += KeepInBounds();
         }
 

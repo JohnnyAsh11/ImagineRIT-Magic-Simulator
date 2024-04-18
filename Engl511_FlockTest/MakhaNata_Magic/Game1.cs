@@ -25,9 +25,13 @@ namespace MakhaNata_Magic
 
         private SimState simState;
         private KeyboardState prevKBState; 
-        private GamePadState prevControllerState;
+        private GamePadState prevGPState;
         private SpriteFont simFont;
         private Vector2 centerScreen;
+        private const uint hostCap = 40;
+        private byte spellByte;
+
+        private SpellManager spellManager;
 
         public Game1()
         {
@@ -47,6 +51,7 @@ namespace MakhaNata_Magic
             //setting up some starting values
             simState = SimState.Menu;
             centerScreen = new Vector2((Globals.Graphics.GraphicsDevice.Viewport.Width / 2), 0);
+            spellByte = 0;
         }
 
         protected override void LoadContent()
@@ -74,13 +79,21 @@ namespace MakhaNata_Magic
             {
                 hosts.Add(new Host());
             }
+
+            spellManager = new SpellManager();
+            spellManager.PlayerCastSpell += DebugOutput;
+        }
+
+        public void DebugOutput(Spell spell)
+        {
+            Debug.Write("Spell Successfully cast! :: " + spell.ToString());
         }
 
         protected override void Update(GameTime gameTime)
         {
             //Setting control variable values
             KeyboardState kbState = Keyboard.GetState();
-            GamePadState controllerState = GamePad.GetState(PlayerIndex.One);
+            GamePadState gpState = GamePad.GetState(PlayerIndex.One);
             Globals.GameTime = gameTime;
 
             switch (simState)
@@ -89,7 +102,7 @@ namespace MakhaNata_Magic
 
                     //polling for input to a state change
                     if (SingleKeyPress(kbState, Keys.Enter) ||
-                        SingleControllerPress(controllerState, Buttons.A))
+                        SingleControllerPress(gpState, Buttons.A))
                     {
                         simState = SimState.Simulation;
                     }
@@ -127,6 +140,8 @@ namespace MakhaNata_Magic
                     break;
                 case SimState.Simulation:
 
+                    spellManager.Update(gpState, prevGPState);
+
                     //Updates for the simulation state
                     foreach (Host host in hosts)
                     {
@@ -135,14 +150,21 @@ namespace MakhaNata_Magic
 
                     //polling for input into a state change
                     if (SingleKeyPress(kbState, Keys.Enter) || 
-                        SingleControllerPress(controllerState, Buttons.Start))
+                        SingleControllerPress(gpState, Buttons.Start))
                     {
                         simState = SimState.Pause;
                     }
                     if (SingleKeyPress(kbState, Keys.Space) || 
-                        SingleControllerPress(controllerState, Buttons.A))
+                        SingleControllerPress(gpState, Buttons.A))
                     {
                         hosts.Add(new Host());
+
+                        //if the hosts go over the cap
+                        if (hosts.Count > hostCap)
+                        {
+                            //remove the first one
+                            hosts.RemoveAt(0);
+                        }
                     }
 
                     break;
@@ -150,14 +172,14 @@ namespace MakhaNata_Magic
 
                     //polling for input
                     if (SingleKeyPress(kbState, Keys.Enter) || 
-                        SingleControllerPress(controllerState, Buttons.B) || 
-                        SingleControllerPress(controllerState, Buttons.Start))
+                        SingleControllerPress(gpState, Buttons.B) || 
+                        SingleControllerPress(gpState, Buttons.Start))
                     {
                         //if enter was pressed, return to the sim
                         simState = SimState.Simulation;
                     }
                     else if (SingleKeyPress(kbState, Keys.Space) || 
-                             SingleControllerPress(controllerState, Buttons.Back))
+                             SingleControllerPress(gpState, Buttons.Back))
                     {
                         //if space was pressed, return to the main menu
                         Reset();
@@ -168,7 +190,7 @@ namespace MakhaNata_Magic
 
             }
 
-            prevControllerState = controllerState;
+            prevGPState = gpState;
             prevKBState = kbState;
             base.Update(gameTime);
         }
@@ -264,7 +286,7 @@ namespace MakhaNata_Magic
         /// <returns>Whether or not a single press of the controller occurred</returns>
         private bool SingleControllerPress(GamePadState controllerState, Buttons button)
         {
-            return controllerState.IsButtonDown(button) && prevControllerState.IsButtonUp(button);
+            return controllerState.IsButtonDown(button) && prevGPState.IsButtonUp(button);
         }
 
         /// <summary>
