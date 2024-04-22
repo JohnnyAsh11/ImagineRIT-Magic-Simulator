@@ -131,12 +131,20 @@ namespace MakhaNata_Magic
         }
 
         //Methods:
+        /// <summary>
+        /// Per frame logic update method for the SpellManager class
+        /// </summary>
+        /// <param name="gpState">Current state of the controls input</param>
+        /// <param name="prevGPState">Previous state of the controls input</param>
         public void Update(GamePadState gpState, GamePadState prevGPState)
         {
+            //making sure that there is no spell already active
             if (!isSpellActive)
             {
+                //looping through all of the spells in Dictionary
                 for (int i = 0; i < spells.Count; i++)
                 {
+                    //casting the current lcv to the Spell enum
                     Spell spell = (Spell)i;
 
                     //calling the SpellPolling method on all spells
@@ -145,10 +153,16 @@ namespace MakhaNata_Magic
                         gpState,
                         prevGPState))
                     {
+                        //if the PlayerCastSpell event is not null
                         if (PlayerCastSpell != null)
                         {
+                            //invoke it 
                             PlayerCastSpell(spell);
+
+                            //set the Active Spell bool to true
                             isSpellActive = true;
+
+                            //set the spell duration timer
                             spellTimer = 1;
                         }
                     }
@@ -156,11 +170,16 @@ namespace MakhaNata_Magic
             }
             else
             {
+                //decrementing the spellTimer by delta time
                 spellTimer -= Globals.DeltaTime;
 
+                //if delta time is goes under or is 0
                 if (spellTimer < 0)
                 {
+                    //set it to zero
                     spellTimer = 0;
+
+                    //set the active spell to false
                     isSpellActive = false;
                 }
             }
