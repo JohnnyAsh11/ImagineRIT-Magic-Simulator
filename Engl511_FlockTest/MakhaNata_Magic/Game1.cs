@@ -81,12 +81,6 @@ namespace MakhaNata_Magic
             }
 
             spellManager = new SpellManager();
-            spellManager.PlayerCastSpell += DebugOutput;
-        }
-
-        public void DebugOutput(Spell spell)
-        {
-            Debug.Write("Spell Successfully cast! :: " + spell.ToString());
         }
 
         protected override void Update(GameTime gameTime)

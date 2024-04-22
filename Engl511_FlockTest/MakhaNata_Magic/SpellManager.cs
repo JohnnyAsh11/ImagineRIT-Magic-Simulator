@@ -16,10 +16,10 @@ namespace MakhaNata_Magic
 
     public enum SpellStage
     {
-        Stage1 = 0,
-        Stage2 = 2,
-        Stage3 = 4,
-        Stage4 = 6
+        Stage1,
+        Stage2,
+        Stage3,
+        Stage4
     }
 
 
@@ -33,6 +33,7 @@ namespace MakhaNata_Magic
         private float spellTimer;
         private bool isSpellActive;
         private Buttons prevGPPress;
+        private List<Buttons> buttons;
 
         /// <summary>
         /// whenever a new spell is cast, invoke this event passing in the associated spell enum
@@ -42,6 +43,12 @@ namespace MakhaNata_Magic
         //Properties:
 
         //Constructors:
+
+        public void DebugOutput(Spell spell)
+        {
+            Debug.Write("Spell Successfully cast! :: \n" + spell.ToString());
+        }
+
         public SpellManager()
         {
             timer = 0f;
@@ -49,6 +56,40 @@ namespace MakhaNata_Magic
             spells = new Dictionary<string, byte>();
             inputSchemes = new Dictionary<string, Dictionary<SpellStage, Buttons>>();
             StreamReader reader = null!;
+
+            //------------------------------------------------
+            //      CHANGE THIS LATER
+            PlayerCastSpell += DebugOutput;
+            //------------------------------------------------
+
+            buttons = new List<Buttons>
+            {
+                Buttons.A,
+                Buttons.X,
+                Buttons.Y,
+                Buttons.B,
+                Buttons.DPadLeft,
+                Buttons.DPadRight,
+                Buttons.DPadUp,
+                Buttons.DPadDown,
+                Buttons.LeftThumbstickDown,
+                Buttons.LeftThumbstickRight,
+                Buttons.LeftThumbstickLeft,
+                Buttons.LeftThumbstickUp,
+                Buttons.RightThumbstickDown,
+                Buttons.RightThumbstickRight,
+                Buttons.RightThumbstickLeft,
+                Buttons.RightThumbstickUp,
+                Buttons.Back,
+                Buttons.BigButton,
+                Buttons.LeftShoulder,
+                Buttons.RightShoulder,
+                Buttons.LeftStick,
+                Buttons.RightStick,
+                Buttons.LeftTrigger,
+                Buttons.RightTrigger,
+                Buttons.Start
+            };
 
             try
             {
@@ -63,7 +104,7 @@ namespace MakhaNata_Magic
                     splitData = rawData.Split('|');
 
                     //Setting the dictionary values
-                    spells[splitData[0]] = 0;
+                    spells[splitData[0]] = 0b10000000;
                     inputSchemes[splitData[0]] = new Dictionary<SpellStage, Buttons>();
 
                     //populating the schemes
@@ -108,7 +149,7 @@ namespace MakhaNata_Magic
                         {
                             PlayerCastSpell(spell);
                             isSpellActive = true;
-                            spellTimer = 10;
+                            spellTimer = 1;
                         }
                     }
                 }
@@ -157,10 +198,10 @@ namespace MakhaNata_Magic
             if (spells.ContainsKey(spellName))
             {
                 //getting the int index
-                int indexCheck = FindFirstFalseIndex(spells[spellName]);
+                int indexCheck = IndexAtTrue(spells[spellName]);
 
                 //if the spell is already completed
-                if (indexCheck > 6)
+                if (indexCheck >= 4)
                 {
                     //then return true
                     return true;
@@ -174,32 +215,35 @@ namespace MakhaNata_Magic
                 {
                     //if that input is pressed, update the associated
                     //  indices of that spell's byte
-                    int changeIndices = (int)current;
-
-                    //updating the 2 next indices of the byte
-                    spells[spellName] = PackData(
-                        PackData(spells[spellName], changeIndices, true), 
-                        changeIndices + 1, 
-                        true);
+                    spells[spellName] >>= 1;
 
                     //saving the last key to be pressed
                     prevGPPress = inputSchemes[spellName][current];
                 }
-                else if (gpState != prevGPState)
+                else
                 {
-                    //if the matching input was not selected than reset the byte
-                    spells[spellName] = 0;
+                    foreach (Buttons button in buttons)
+                    {
+                        if (gpState.IsButtonDown(button) && 
+                            button != prevGPPress && 
+                            button != inputSchemes[spellName][current])
+                        {
+                            //if the matching input was not selected than reset the byte
+                            spells[spellName] = 0b10000000;
+                            Debug.Write("FAIL");
 
-                    //set the controller vibration
-                    GamePad.SetVibration(PlayerIndex.One, 0.1f, 0.1f);
+                            //set the controller vibration
+                            GamePad.SetVibration(PlayerIndex.One, 0.5f, 0.5f);
 
-                    //and set the timer for the vibration to end
-                    timer = 1;
+                            //and set the timer for the vibration to end
+                            timer = 1;
+                        }
+                    }
                 }
             }
 
             //returns whether or not the spell is completed
-            return spells[spellName] == 0b11111111;
+            return spells[spellName] == 0b00001000;
         }
 
         #region Bitpacking methods
@@ -314,7 +358,7 @@ namespace MakhaNata_Magic
         /// <returns>the index of the single true value</returns>
         private int IndexAtTrue(byte data)
         {
-            int index = 7;
+            int index = 0;
 
             for (byte i = 1 << 7; i > 0; i >>= 1)
             {
@@ -323,7 +367,7 @@ namespace MakhaNata_Magic
                     return index;
                 }
 
-                index--;
+                index++;
             }
 
             //default fail value
