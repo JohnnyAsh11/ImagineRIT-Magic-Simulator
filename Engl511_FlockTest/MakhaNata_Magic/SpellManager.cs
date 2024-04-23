@@ -14,6 +14,9 @@ namespace MakhaNata_Magic
 {
     public delegate void OnSpellCast(Spell castSpell);
 
+    /// <summary>
+    /// Tracks the current input stage of a spell
+    /// </summary>
     public enum SpellStage
     {
         Stage1,
@@ -22,10 +25,11 @@ namespace MakhaNata_Magic
         Stage4
     }
 
-
+    /// <summary>
+    /// Manages all of the input polling for the actual spell casting in the simulation
+    /// </summary>
     public class SpellManager
     {
-
         //Fields:
         private Dictionary<string, byte> spells;
         private Dictionary<string, Dictionary<SpellStage, Buttons>> inputSchemes;
@@ -34,21 +38,19 @@ namespace MakhaNata_Magic
         private bool isSpellActive;
         private Buttons prevGPPress;
         private List<Buttons> buttons;
+        private string activeSpell;
 
         /// <summary>
         /// whenever a new spell is cast, invoke this event passing in the associated spell enum
         /// </summary>
         public event OnSpellCast PlayerCastSpell;
 
-        //Properties:
+        //Properties: - NONE -
 
         //Constructors:
-
-        public void DebugOutput(Spell spell)
-        {
-            Debug.Write("Spell Successfully cast! :: \n" + spell.ToString());
-        }
-
+        /// <summary>
+        /// Default constructor for the SpellManager class
+        /// </summary>
         public SpellManager()
         {
             timer = 0f;
@@ -57,11 +59,7 @@ namespace MakhaNata_Magic
             inputSchemes = new Dictionary<string, Dictionary<SpellStage, Buttons>>();
             StreamReader reader = null!;
 
-            //------------------------------------------------
-            //      CHANGE THIS LATER
-            PlayerCastSpell += DebugOutput;
-            //------------------------------------------------
-
+            //initializing the list of Buttons with the enumeration values
             buttons = new List<Buttons>
             {
                 Buttons.A,
@@ -87,8 +85,7 @@ namespace MakhaNata_Magic
                 Buttons.LeftStick,
                 Buttons.RightStick,
                 Buttons.LeftTrigger,
-                Buttons.RightTrigger,
-                Buttons.Start
+                Buttons.RightTrigger
             };
 
             try
@@ -104,14 +101,21 @@ namespace MakhaNata_Magic
                     splitData = rawData.Split('|');
 
                     //Setting the dictionary values
-                    spells[splitData[0]] = 0b10000000;
-                    inputSchemes[splitData[0]] = new Dictionary<SpellStage, Buttons>();
+                    if (!spells.ContainsKey(splitData[0]))
+                    {
+                        spells[splitData[0]] = 0b10000000;
+                    }
 
-                    //populating the schemes
-                    inputSchemes[splitData[0]][SpellStage.Stage1] = (Buttons)int.Parse(splitData[1]);
-                    inputSchemes[splitData[0]][SpellStage.Stage2] = (Buttons)int.Parse(splitData[2]);
-                    inputSchemes[splitData[0]][SpellStage.Stage3] = (Buttons)int.Parse(splitData[3]);
-                    inputSchemes[splitData[0]][SpellStage.Stage4] = (Buttons)int.Parse(splitData[4]);
+                    if (!inputSchemes.ContainsKey(splitData[0]))
+                    {
+                        inputSchemes[splitData[0]] = new Dictionary<SpellStage, Buttons>();
+
+                        //populating the schemes
+                        inputSchemes[splitData[0]][SpellStage.Stage1] = (Buttons)int.Parse(splitData[1]);
+                        inputSchemes[splitData[0]][SpellStage.Stage2] = (Buttons)int.Parse(splitData[2]);
+                        inputSchemes[splitData[0]][SpellStage.Stage3] = (Buttons)int.Parse(splitData[3]);
+                        inputSchemes[splitData[0]][SpellStage.Stage4] = (Buttons)int.Parse(splitData[4]);
+                    }
                 }
             }
             catch (Exception e)
@@ -136,35 +140,32 @@ namespace MakhaNata_Magic
         /// </summary>
         /// <param name="gpState">Current state of the controls input</param>
         /// <param name="prevGPState">Previous state of the controls input</param>
-        public void Update(GamePadState gpState, GamePadState prevGPState)
+        /// <param name="spell">The player selected spell</param>
+        public void Update(GamePadState gpState, GamePadState prevGPState, Spell spell)
         {
             //making sure that there is no spell already active
             if (!isSpellActive)
             {
-                //looping through all of the spells in Dictionary
-                for (int i = 0; i < spells.Count; i++)
+                //calling the Spell Poll on the selected Spell
+                if (SpellPolling(
+                    spell.ToString(),
+                    gpState,
+                    prevGPState))
                 {
-                    //casting the current lcv to the Spell enum
-                    Spell spell = (Spell)i;
-
-                    //calling the SpellPolling method on all spells
-                    if (SpellPolling(
-                        spell.ToString(),
-                        gpState,
-                        prevGPState))
+                    //if the PlayerCastSpell event is not null
+                    if (PlayerCastSpell != null)
                     {
-                        //if the PlayerCastSpell event is not null
-                        if (PlayerCastSpell != null)
-                        {
-                            //invoke it 
-                            PlayerCastSpell(spell);
+                        //save the cast spell
+                        activeSpell = spell.ToString();
 
-                            //set the Active Spell bool to true
-                            isSpellActive = true;
+                        //invoke it 
+                        PlayerCastSpell(spell);
 
-                            //set the spell duration timer
-                            spellTimer = 1;
-                        }
+                        //set the Active Spell bool to true
+                        isSpellActive = true;
+
+                        //set the spell duration timer
+                        spellTimer = 10;
                     }
                 }
             }
@@ -181,6 +182,12 @@ namespace MakhaNata_Magic
 
                     //set the active spell to false
                     isSpellActive = false;
+
+                    //reseting the spell's byte
+                    spells[activeSpell] = 0b10000000;
+
+                    //invoking the casting event on the base state
+                    PlayerCastSpell(Spell.Hiduun);
                 }
             }
 
@@ -202,7 +209,6 @@ namespace MakhaNata_Magic
             }
         }
 
-
         /// <summary>
         /// Polls the spells for their needed input and resets 
         /// their input string if conditions are not met
@@ -213,161 +219,60 @@ namespace MakhaNata_Magic
         /// <returns>Whether or not the spell was completed for casting</returns>
         private bool SpellPolling(string spellName, GamePadState gpState, GamePadState prevGPState)
         {
-            //if the passed in key is within the Dictionary
-            if (spells.ContainsKey(spellName))
+            if (spellName != "Hiduun")
             {
-                //getting the int index
-                int indexCheck = IndexAtTrue(spells[spellName]);
-
-                //if the spell is already completed
-                if (indexCheck >= 4)
+                //if the passed in key is within the Dictionary
+                if (spells.ContainsKey(spellName))
                 {
-                    //then return true
-                    return true;
-                }
+                    //getting the int index
+                    int indexCheck = IndexAtTrue(spells[spellName]);
 
-                //Otherwise cast the int index to the SpellStage
-                SpellStage current = (SpellStage)indexCheck;
-
-                //Polling for the input needed from that spell's input scheme
-                if (gpState.IsButtonDown(inputSchemes[spellName][current]))
-                {
-                    //if that input is pressed, update the associated
-                    //  indices of that spell's byte
-                    spells[spellName] >>= 1;
-
-                    //saving the last key to be pressed
-                    prevGPPress = inputSchemes[spellName][current];
-                }
-                else
-                {
-                    foreach (Buttons button in buttons)
+                    //if the spell is already completed
+                    if (indexCheck >= 4)
                     {
-                        if (gpState.IsButtonDown(button) && 
-                            button != prevGPPress && 
-                            button != inputSchemes[spellName][current])
+                        //then return true
+                        return true;
+                    }
+
+                    //Otherwise cast the int index to the SpellStage
+                    SpellStage current = (SpellStage)indexCheck;
+
+                    //Polling for the input needed from that spell's input scheme
+                    if (gpState.IsButtonDown(inputSchemes[spellName][current]))
+                    {
+                        //if that input is pressed, update the associated
+                        //  indices of that spell's byte
+                        spells[spellName] >>= 1;
+
+                        //saving the last key to be pressed
+                        prevGPPress = inputSchemes[spellName][current];
+                    }
+                    else
+                    {
+                        foreach (Buttons button in buttons)
                         {
-                            //if the matching input was not selected than reset the byte
-                            spells[spellName] = 0b10000000;
-                            Debug.Write("FAIL");
+                            if (gpState.IsButtonDown(button) &&
+                                button != prevGPPress &&
+                                button != inputSchemes[spellName][current])
+                            {
+                                //if the matching input was not selected than reset the byte
+                                spells[spellName] = 0b10000000;
+                                Debug.Write("FAIL");
 
-                            //set the controller vibration
-                            GamePad.SetVibration(PlayerIndex.One, 0.5f, 0.5f);
+                                //set the controller vibration
+                                GamePad.SetVibration(PlayerIndex.One, 0.5f, 0.5f);
 
-                            //and set the timer for the vibration to end
-                            timer = 1;
+                                //and set the timer for the vibration to end
+                                timer = 1;
+                            }
                         }
                     }
                 }
+
+                //returns whether or not the spell is completed
+                return spells[spellName] == 0b00001000;
             }
-
-            //returns whether or not the spell is completed
-            return spells[spellName] == 0b00001000;
-        }
-
-        #region Bitpacking methods
-        /// <summary>
-        /// PROBLEM IN THIS METHOD::: FIX HERE FIRST
-        /// </summary>
-        /// <param name="data"></param>
-        /// <returns></returns>
-        private int FindFirstFalseIndex(byte data)
-        {
-            //declaring a LCV
-            int counter = 0;
-
-            //looping through the 8 indices of a byte
-            for (byte i = 0b10000000; i > 0; i >>= 1)
-            {
-                //if an index does not equal true
-                if ((data & i) == 0)
-                {
-                    //break out of the loop
-                    break;
-                }
-
-                //otherwise, increment the counter
-                counter++;
-            }
-
-            //return the result of the counter
-            return counter;
-        }
-        /// <summary>
-        /// Checks true/false values held within bits
-        /// </summary>
-        /// <param name="data">Byte containing data</param>
-        /// <param name="index">Index of bit being checked in byte</param>
-        /// <returns>the value held at that index</returns>
-        private bool ReadData(byte data, int index)
-        {
-            //checking index bounds
-            if (index >= 0 && index <= 7)
-            {
-                //getting the index being checked in byte form
-                byte indexChecked = (byte)(1 << index);
-
-                //looping through all indices of a byte
-                for (byte i = (byte)1 << 7; i > 0; i >>= 1)
-                {
-                    //if the current iteration matches the index we are attempting to check
-                    if ((i & indexChecked) == indexChecked)
-                    {
-                        //check the data against i and return
-                        // true or false accordingly
-                        if ((data & i) == i)
-                        {
-                            return true;
-                        }
-                        else
-                        {
-                            return false;
-                        }
-                    }
-                }
-            }
-
-            //default result
-            return false;
-        }
-
-        /// <summary>
-        /// Inserts true/false data into a bit
-        /// </summary>
-        /// <param name="data">Byte containing true/false data</param>
-        /// <param name="index">Index of bit being changed</param>
-        /// <param name="value">value of index being changed</param>
-        /// <returns>The new Byte of data</returns>
-        private byte PackData(byte data, int index, bool value)
-        {
-            //default value
-            byte newData = 0;
-
-            //checking to make sure index is in bounds
-            if (index >= 0 && index <= 7)
-            {
-                //placing a 1 at the location being altered
-                byte changes = (byte)(1 << index);
-
-                //if the value is being changed to 0 then filp everything and change
-                //operator to AND
-                if (!value)
-                {
-                    changes = (byte)~changes;
-                    newData = (byte)(data & changes);
-                }
-                else
-                {
-                    //changing the passed in data specifically with OR
-                    newData = (byte)(data | changes);
-                }
-                //returning the new data
-                return newData;
-            }
-            else
-            {
-                return newData;
-            }
+            else { return false; }
         }
 
         /// <summary>
@@ -392,31 +297,6 @@ namespace MakhaNata_Magic
             //default fail value
             return -1;
         }
-
-        /// <summary>
-        /// Checks if all data in the byte is true
-        /// </summary>
-        /// <param name="data">byte being checked</param>
-        /// <returns>whether or not all values are true or not</returns>
-        private bool IfAllTrue(byte data)
-        {
-            int trueCounter = 0;
-
-            //loops 8 times for the length of a byte
-            for (ushort i = 0; i < 8; i++)
-            {
-                //checks at each index if it is true
-                if (ReadData(data, i))
-                {
-                    //if is true, up the counter
-                    trueCounter++;
-                }
-            }
-
-            //return whether or not the counter is 8
-            return trueCounter >= 8;
-        }
-        #endregion
 
     }
 }

@@ -23,6 +23,24 @@ namespace MakhaNata_Magic
             set { position = value; }
         }
 
+        /// <summary>
+        /// Get/set access to the X position
+        /// </summary>
+        public float X
+        {
+            get { return position.X; }
+            set { position.X = value; }
+        }
+
+        /// <summary>
+        /// Get/set access to the Y position
+        /// </summary>
+        public float Y
+        {
+            get { return position.Y; }
+            set { position.Y = value; }
+        }
+
         //Constructors:
         /// <summary>
         /// Parameterized constructor for the GameObject class

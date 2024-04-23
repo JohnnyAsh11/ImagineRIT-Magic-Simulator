@@ -14,7 +14,7 @@ namespace MakhaNata_Magic
     /// </summary>
     public enum Spell
     {
-        Yashmi,     //Protection Spell      Input: A, LeftTrigger, RightTrigger, Y
+        Yashmi,     //Protection Spell
         Hushumi,    //Basic Attack Spell
         Jasica,     //Healing Spell
         Yuruq,      //Burning Spell
@@ -29,16 +29,6 @@ namespace MakhaNata_Magic
         //Fields:
         private List<PhysicsAgent> seekers;
         private Spell currentSpell;
-
-        //Properties:
-        /// <summary>
-        /// Get/set property for the Host's current spell
-        /// </summary>
-        public Spell CurrentSpell
-        {
-            get { return currentSpell; }
-            set { currentSpell = value; }
-        }
 
         //Constructors:
         /// <summary>
@@ -89,22 +79,68 @@ namespace MakhaNata_Magic
         /// </summary>
         public override void CalcSteeringForces()
         {
+            //checking what the current spell is
             switch (currentSpell)
             {
                 case Spell.Hiduun:
 
                     //adding he physics steering algorithms necessary for the Hiduun state
                     totalForce += Wander(1, 5) * 1.5f;
+
                     totalForce += KeepInBounds();
 
                     break;
                 case Spell.Yashmi:
+
+                    totalForce += Seek(new Vector2(
+                        Globals.SeekerCenter.X,
+                        Globals.SeekerCenter.Y)) * 2.0f;
+
+                    totalForce += KeepInBounds();
+
                     break;
                 case Spell.Hushumi:
+
+                    //looping through the Host's Seekers
+                    foreach (PhysicsAgent agent in seekers)
+                    {
+                        //altering the position of the agents based on a small formula
+                        agent.Y += (Globals.SeekerCenter.Y / agent.Y);
+                        agent.X += (Globals.SeekerCenter.X / agent.X);
+
+                        agent.Y *= 1.001f;
+                        agent.X *= 1.001f;
+                    }
+
+                    totalForce += KeepInBounds();
+
                     break;
                 case Spell.Jasica:
+
+                    //foreach (PhysicsAgent agent in seekers)
+                    //{
+                    //    
+                    //}
+
+                    totalForce += KeepInBounds();
+
                     break;
                 case Spell.Yuruq:
+
+                    //creating a random object
+                    Random rng = new Random();
+
+                    //looping through the seekers
+                    foreach (PhysicsAgent agent in seekers)
+                    {
+                        agent.Y += rng.Next(-10, 11);
+                        agent.X += rng.Next(-10, 11);
+                    }
+
+                    //The Hamrakytes still wander under this spell
+                    totalForce += Wander(1, 5) * 1.75f;
+                    totalForce += KeepInBounds();
+
                     break;
             }
         }
@@ -150,6 +186,15 @@ namespace MakhaNata_Magic
         private Vector2 GiveLocation()
         {
             return position.Position;
+        }
+
+        /// <summary>
+        /// Sets the value for the current spell
+        /// </summary>
+        /// <param name="_currentSpell">the new current spell</param>
+        public void SetCurrentSpell(Spell _currentSpell)
+        {
+            currentSpell = _currentSpell;
         }
     }
 }

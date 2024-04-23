@@ -17,10 +17,8 @@ namespace MakhaNata_Magic
         Pause
     }
 
-
     public class Game1 : Game
     {
-
         private List<Host> hosts;
 
         private SimState simState;
@@ -28,11 +26,15 @@ namespace MakhaNata_Magic
         private GamePadState prevGPState;
         private SpriteFont simFont;
         private Vector2 centerScreen;
-        private const uint hostCap = 40;
+        private const uint hostCap = 15;
         private byte spellByte;
 
+        private SpellUI uiManager;
         private SpellManager spellManager;
 
+        /// <summary>
+        /// the Game1 class's default constructor
+        /// </summary>
         public Game1()
         {
             Globals.Graphics = new GraphicsDeviceManager(this);
@@ -44,6 +46,9 @@ namespace MakhaNata_Magic
             Window.ClientSizeChanged += OnResize;
         }
 
+        /// <summary>
+        /// MonoGame's Initialize method
+        /// </summary>
         protected override void Initialize()
         {
             base.Initialize();
@@ -54,12 +59,16 @@ namespace MakhaNata_Magic
             spellByte = 0;
         }
 
+        /// <summary>
+        /// MonoGame's Content load method
+        /// </summary>
         protected override void LoadContent()
         {
             Globals.SB = new SpriteBatch(GraphicsDevice);
 
             //loading the font
             simFont = Content.Load<SpriteFont>("BungeeSpice");
+            Globals.SF = simFont;
             
             //loading textures into the gameTextures dictionary
             Dictionary<string, Texture2D> gameTextures = new Dictionary<string, Texture2D>();
@@ -69,20 +78,38 @@ namespace MakhaNata_Magic
 
             gameTextures["StartButton"] = Content.Load<Texture2D>("StartImage");
             gameTextures["BackButton"] = Content.Load<Texture2D>("BackImage");
+            gameTextures["PadRight"] = Content.Load<Texture2D>("DPad_Right");
+            gameTextures["PadUp"] = Content.Load<Texture2D>("DPad_Up");
+            gameTextures["A"] = Content.Load<Texture2D>("A_Button");
+            gameTextures["Y"] = Content.Load<Texture2D>("Y_Button");
+            gameTextures["RightTrigger"] = Content.Load<Texture2D>("Trigger_Right");
+            gameTextures["LeftTrigger"] = Content.Load<Texture2D>("Trigger_Left");
+            gameTextures["X"] = Content.Load<Texture2D>("X_Button");
+            gameTextures["B"] = Content.Load<Texture2D>("B_Button");
+            gameTextures["LeftBumper"] = Content.Load<Texture2D>("Bumper_Left");
+            gameTextures["RightBumper"] = Content.Load<Texture2D>("Bumper_Right");
 
             //giving the dictionary to the Globals class
             Globals.GameTextures = gameTextures;
+            
+            spellManager = new SpellManager();
+            uiManager = new SpellUI();
 
             //creating the starting hosts for the simulation
             hosts = new List<Host>();
             for (uint i = 0; i < 10; i++)
             {
-                hosts.Add(new Host());
-            }
+                Host host = new Host();
+                hosts.Add(host);
 
-            spellManager = new SpellManager();
+                //subscribing all Hosts to the spell change event
+                spellManager.PlayerCastSpell += host.SetCurrentSpell;
+            }
         }
 
+        /// <summary>
+        /// MonoGame's Update logic method
+        /// </summary>
         protected override void Update(GameTime gameTime)
         {
             //Setting control variable values
@@ -101,40 +128,10 @@ namespace MakhaNata_Magic
                         simState = SimState.Simulation;
                     }
 
-                    #region controller keybind testing
-                    //GamePadState controllerState = GamePad.GetState(PlayerIndex.One);
-
-                    //int moveSpeed = 5;
-                    //if (controllerState.IsButtonDown(Buttons.LeftThumbstickUp))
-                    //{
-                    //    controllerTesting.Y -= moveSpeed;
-                    //    GamePad.SetVibration(PlayerIndex.One, 0.5f, 0.5f);
-                    //}
-                    //else if (controllerState.IsButtonDown(Buttons.LeftThumbstickDown))
-                    //{
-                    //    controllerTesting.Y += moveSpeed;
-                    //    GamePad.SetVibration(PlayerIndex.One, 0.5f, 0.5f);
-                    //}
-                    //else if (controllerState.IsButtonDown(Buttons.LeftThumbstickLeft))
-                    //{
-                    //    controllerTesting.X -= moveSpeed;
-                    //    GamePad.SetVibration(PlayerIndex.One, 0.5f, 0.5f);
-                    //}
-                    //else if (controllerState.IsButtonDown(Buttons.LeftThumbstickRight))
-                    //{
-                    //    controllerTesting.X += moveSpeed;
-                    //    GamePad.SetVibration(PlayerIndex.One, 0.5f, 0.5f);
-                    //}
-                    //else
-                    //{
-                    //    GamePad.SetVibration(PlayerIndex.One, 0.0f, 0.0f);
-                    //}
-                    #endregion
-
                     break;
                 case SimState.Simulation:
 
-                    spellManager.Update(gpState, prevGPState);
+                    spellManager.Update(gpState, prevGPState, uiManager.ChosenSpell);
 
                     //Updates for the simulation state
                     foreach (Host host in hosts)
@@ -148,21 +145,30 @@ namespace MakhaNata_Magic
                     {
                         simState = SimState.Pause;
                     }
-                    if (SingleKeyPress(kbState, Keys.Space) || 
+                    if (uiManager.ChosenSpell == Spell.Hiduun &&
                         SingleControllerPress(gpState, Buttons.A))
                     {
-                        hosts.Add(new Host());
+                        Host host = new Host();
+                        hosts.Add(host);
+
+                        //subscribing all Hosts to the spell change event
+                        spellManager.PlayerCastSpell += host.SetCurrentSpell;
 
                         //if the hosts go over the cap
                         if (hosts.Count > hostCap)
                         {
-                            //remove the first one
+                            //unsubscribing the first host from the spell manager
+                            spellManager.PlayerCastSpell -= hosts[0].SetCurrentSpell;
+
+                            //remove the first host from the list
                             hosts.RemoveAt(0);
                         }
                     }
 
                     break;
                 case SimState.Pause:
+
+                    uiManager.Update(gpState);
 
                     //polling for input
                     if (SingleKeyPress(kbState, Keys.Enter) || 
@@ -181,7 +187,6 @@ namespace MakhaNata_Magic
                     }
 
                     break;
-
             }
 
             prevGPState = gpState;
@@ -189,6 +194,9 @@ namespace MakhaNata_Magic
             base.Update(gameTime);
         }
 
+        /// <summary>
+        /// MonoGame's Draw method
+        /// </summary>
         protected override void Draw(GameTime gameTime)
         {
             GraphicsDevice.Clear(Color.Black);
@@ -199,10 +207,11 @@ namespace MakhaNata_Magic
             {
                 case SimState.Menu:
 
+                    //Drawing the menu UI
                     Globals.SB.DrawString(
                         simFont,
                         "Blood Magic Simulator",
-                        new Vector2(centerScreen.X - 375, 10),
+                        new Vector2(centerScreen.X - 1200, centerScreen.Y),
                         Color.Red,
                         0.0f,
                         Vector2.Zero,
@@ -212,7 +221,7 @@ namespace MakhaNata_Magic
                     Globals.SB.DrawString(
                         simFont,
                         "Press A to begin",
-                        new Vector2(centerScreen.X - 200, 100),
+                        new Vector2(centerScreen.X - 600, centerScreen.Y + 200),
                         Color.DarkOrchid,
                         0.0f,
                         Vector2.Zero,
@@ -223,25 +232,28 @@ namespace MakhaNata_Magic
                     break;
                 case SimState.Simulation:
 
+                    //Looping through the hosts
                     foreach (Host host in hosts)
                     {
+                        //rendering them to the window
                         host.Draw();
                     }
 
+                    //Drawing the UI elements for the Simulation state
                     Globals.SB.Draw(
                         Globals.GameTextures["StartButton"],
-                        new Vector2(centerScreen.X - 175, centerScreen.Y - 10),
+                        new Vector2(centerScreen.X - 540, Globals.Graphics.GraphicsDevice.Viewport.Height - 200),
                         null,
                         Color.White,
                         0.0f,
                         Vector2.Zero,
-                        0.15f,
+                        0.5f,
                         SpriteEffects.None,
                         1f);
                     Globals.SB.DrawString(
                         simFont,
-                        "Press     to view spells",
-                        new Vector2(centerScreen.X - 350, centerScreen.Y),
+                        "Press     to pick spells",
+                        new Vector2(centerScreen.X - 1100, Globals.Graphics.GraphicsDevice.Viewport.Height - 175),
                         Color.DarkOrchid,
                         0.0f,
                         Vector2.Zero,
@@ -252,7 +264,8 @@ namespace MakhaNata_Magic
                     break;
                 case SimState.Pause:
 
-
+                    //Calling the UI manager's Draw method
+                    uiManager.Draw(centerScreen);
 
                     break;
             }
@@ -308,6 +321,10 @@ namespace MakhaNata_Magic
                 Globals.Graphics.PreferredBackBufferHeight = Globals.Graphics.GraphicsDevice.Viewport.Height;
                 Globals.Graphics.ApplyChanges();
             }
+
+            Globals.SeekerCenter = new Vector2(
+                Globals.Graphics.GraphicsDevice.Viewport.Width / 2,
+                Globals.Graphics.GraphicsDevice.Viewport.Height / 2);
 
             //changing the position of the top center
             centerScreen.X = (Globals.Graphics.GraphicsDevice.Viewport.Width / 2);

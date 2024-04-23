@@ -6,24 +6,32 @@ namespace MakhaNata_Magic
 {
     public delegate Vector2 GetLocation();
 
+    /// <summary>
+    /// Seeker class where every instance of represents a single pixel of an instance of a Host
+    /// </summary>
     public class Seeker : PhysicsAgent
     {
-
         //Fields:
         private uint width;
         private uint height;
-
         public event GetLocation OnSeekHost;
 
-        //Properties: - NONE -
-
         //Constructors:
+        /// <summary>
+        /// Default constructor for the Seeker class
+        /// </summary>
         public Seeker()
             : base()
         {
             width = (uint)Globals.Graphics.GraphicsDevice.Viewport.Width;
             height = (uint)Globals.Graphics.GraphicsDevice.Viewport.Height;
         }
+
+        /// <summary>
+        /// Parameterized constructor for the Seeker class
+        /// </summary>
+        /// <param name="x">specified X position of the Seeker class</param>
+        /// <param name="y">specified Y position of the Seeker class</param>
         public Seeker(float x, float y)
             : base()
         {
@@ -35,6 +43,9 @@ namespace MakhaNata_Magic
         }
 
         //Methods:
+        /// <summary>
+        /// Calculates the steering forces for the Physics Agent Update method
+        /// </summary>
         public override void CalcSteeringForces()
         {
             KeyboardState kbState = Keyboard.GetState();
@@ -52,11 +63,6 @@ namespace MakhaNata_Magic
                 //seek the point that is returned
                 totalForce += Seek(OnSeekHost()) * .15f;
             }
-
-            //allowing the pixel boids to wrap
-            //ScreenWrap();
-            //totalForce += KeepInBounds();
         }
-
     }
 }
