@@ -63,6 +63,8 @@ namespace MakhaNata_Magic
                 //seek the point that is returned
                 totalForce += Seek(OnSeekHost()) * .15f;
             }
+
+            //ScreenWrap();
         }
     }
 }

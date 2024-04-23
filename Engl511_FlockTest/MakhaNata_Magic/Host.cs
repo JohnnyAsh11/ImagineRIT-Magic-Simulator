@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -28,6 +29,7 @@ namespace MakhaNata_Magic
     {
         //Fields:
         private List<PhysicsAgent> seekers;
+        private const int numOfSeekers = 1000;
         private Spell currentSpell;
 
         //Constructors:
@@ -42,11 +44,12 @@ namespace MakhaNata_Magic
 
             //creating the seekers
             seekers = new List<PhysicsAgent>();
-            GenerateSeekers(500);
 
             //Randomizing the position of the Hosts
             position.X = rng.Next(0, Globals.Graphics.GraphicsDevice.Viewport.Width + 1);
             position.Y = rng.Next(0, Globals.Graphics.GraphicsDevice.Viewport.Height + 1);
+
+            GenerateSeekers(numOfSeekers);
 
             //apending the Seeker update method onto the PhysicsAgent update method
             this.OnPhysicsUpdate += UpdateSeekers;
@@ -92,6 +95,7 @@ namespace MakhaNata_Magic
                     break;
                 case Spell.Yashmi:
 
+                    //seeking the center of the screen
                     totalForce += Seek(new Vector2(
                         Globals.SeekerCenter.X,
                         Globals.SeekerCenter.Y)) * 2.0f;
@@ -104,12 +108,10 @@ namespace MakhaNata_Magic
                     //looping through the Host's Seekers
                     foreach (PhysicsAgent agent in seekers)
                     {
-                        //altering the position of the agents based on a small formula
-                        agent.Y += (Globals.SeekerCenter.Y / agent.Y);
-                        agent.X += (Globals.SeekerCenter.X / agent.X);
+                        agent.Y = position.Y;
 
-                        agent.Y *= 1.001f;
-                        agent.X *= 1.001f;
+                        //Moving the seekers to the right like darts
+                        agent.X += (Globals.SeekerCenter.X / 50);
                     }
 
                     totalForce += KeepInBounds();
@@ -117,18 +119,29 @@ namespace MakhaNata_Magic
                     break;
                 case Spell.Jasica:
 
-                    //foreach (PhysicsAgent agent in seekers)
-                    //{
-                    //    
-                    //}
+                    //looping through all of the seekers
+                    foreach (PhysicsAgent agent in seekers)
+                    {
+                        //calculating a 1D distance
+                        float distance = agent.X - position.X;
 
-                    totalForce += KeepInBounds();
+                        //if greater than the 0
+                        if (distance > 0)
+                        {
+                            //add
+                            agent.Y += distance * 0.2f; 
+                        }
+                        else
+                        {
+                            //otherwise, subtract
+                            agent.Y -= distance * 0.2f;
+                        }
+                    }
+
+                    totalForce += Seek(new Vector2(Globals.SeekerCenter.X, Globals.SeekerCenter.Y)) * 0.05f;
 
                     break;
                 case Spell.Yuruq:
-
-                    //creating a random object
-                    Random rng = new Random();
 
                     //looping through the seekers
                     foreach (PhysicsAgent agent in seekers)
@@ -165,6 +178,12 @@ namespace MakhaNata_Magic
         {
             //draws the seekers
             DrawSeekers();
+
+            //debug drawing
+            //Globals.SB.Draw(
+            //    Globals.GameTextures["Pixel"],
+            //    position.ToRectangle,
+            //    Color.White);
         }
 
         /// <summary>

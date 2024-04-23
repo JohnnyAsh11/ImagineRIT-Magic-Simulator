@@ -257,7 +257,6 @@ namespace MakhaNata_Magic
                             {
                                 //if the matching input was not selected than reset the byte
                                 spells[spellName] = 0b10000000;
-                                Debug.Write("FAIL");
 
                                 //set the controller vibration
                                 GamePad.SetVibration(PlayerIndex.One, 0.5f, 0.5f);
