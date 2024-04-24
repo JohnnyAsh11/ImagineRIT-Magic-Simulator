@@ -23,6 +23,7 @@ namespace MakhaNata_Magic
         private Texture2D[] yuruqSpellUI;
 
         private Color[] select;
+        private Color[] description;
         private Spell chosenSpell;
         private GamePadState prevGPState;
 
@@ -51,6 +52,15 @@ namespace MakhaNata_Magic
                 Color.White,
                 Color.White,
                 Color.White
+            };
+
+            description = new Color[] 
+            {
+                Color.Red,
+                Color.DarkOrchid,
+                Color.DarkOrchid,
+                Color.DarkOrchid,
+                Color.DarkOrchid
             };
 
             //the visual assets for the Yashmi spell
@@ -104,19 +114,54 @@ namespace MakhaNata_Magic
         public void Draw(Vector2 centerScreen)
         {
             //hiduun
-            DrawArray("Hiduun", hiduunSpellUI, centerScreen, 50, select[0]);
+            DrawArray(
+                "Hiduun", 
+                hiduunSpellUI, 
+                centerScreen, 
+                50, 
+                select[0], 
+                "Creates new Hamrakytes \nfor you to cast spells",
+                description[0]);
 
             //Yashmi
-            DrawArray("Yashmi", yashmiSpellUI, centerScreen, 300, select[1]);
+            DrawArray(
+                "Yashmi", 
+                yashmiSpellUI, 
+                centerScreen, 
+                300, 
+                select[1], 
+                "Uses your hamrakytes \nto defend you",
+                description[1]);
 
             //Hushumi
-            DrawArray("Hushumi", hushumiSpellUI, centerScreen, 550, select[2]);
+            DrawArray(
+                "Hushumi", 
+                hushumiSpellUI, 
+                centerScreen, 
+                550, 
+                select[2], 
+                "Converts your hamrakytes \ninto sharp darts",
+                description[2]);
 
             //Jasica
-            DrawArray("Jasica", jasicaSpellUI, centerScreen, 800, select[3]);
+            DrawArray(
+                "Jasica", 
+                jasicaSpellUI, 
+                centerScreen, 
+                800, 
+                select[3],
+                "returns most of your \nhamrakytes to you",
+                description[3]);
 
             //Yuruq
-            DrawArray("Yuruq", yuruqSpellUI, centerScreen, 1050, select[4]);
+            DrawArray(
+                "Yuruq", 
+                yuruqSpellUI, 
+                centerScreen, 
+                1050, 
+                select[4], 
+                "Causes your hamrakytes to \nreach extreme temperatures",
+                description[4]);
         }
 
         /// <summary>
@@ -126,7 +171,7 @@ namespace MakhaNata_Magic
         /// <param name="textures">array of UI textures</param>
         /// <param name="centerScreen">Vector containing data for the center of the screen</param>
         /// <param name="offsetY">the Y offset for printing</param>
-        private void DrawArray(string spellName, Texture2D[] textures, Vector2 centerScreen, int offsetY, Color tint)
+        private void DrawArray(string spellName, Texture2D[] textures, Vector2 centerScreen, int offsetY, Color tint, string directions, Color directionTint)
         {
             int offsetX = -300;
 
@@ -155,6 +200,17 @@ namespace MakhaNata_Magic
                 //moving the offset over for the next control of the spell
                 offsetX += 250;
             }
+
+            Globals.SB.DrawString(
+                Globals.SF,
+                directions,
+                new Vector2(centerScreen.X + 750, centerScreen.Y + offsetY + 100),
+                directionTint,
+                0.0f,
+                Vector2.Zero,
+                0.15f,
+                SpriteEffects.None,
+                0.0f);
         }
 
         /// <summary>
@@ -177,6 +233,9 @@ namespace MakhaNata_Magic
                         //alter the color values
                         select[i] = Color.White;
                         select[i + 1] = Color.Red;
+
+                        description[i] = Color.DarkOrchid;
+                        description[i + 1] = Color.Red;
 
                         //setting the value of the chosen spell
                         int num = i + 1;
@@ -216,6 +275,9 @@ namespace MakhaNata_Magic
                         //if so alter the color values
                         select[i] = Color.White;
                         select[i - 1] = Color.Red;
+
+                        description[i] = Color.DarkOrchid;
+                        description[i - 1] = Color.Red;
 
                         //setting the value of the chosen spell
                         int num = i - 1;

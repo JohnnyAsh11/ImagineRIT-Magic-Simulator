@@ -173,13 +173,14 @@ namespace MakhaNata_Magic
                     //polling for input
                     if (SingleKeyPress(kbState, Keys.Enter) || 
                         SingleControllerPress(gpState, Buttons.B) || 
-                        SingleControllerPress(gpState, Buttons.Start))
+                        SingleControllerPress(gpState, Buttons.Start) || 
+                        SingleControllerPress(gpState, Buttons.A))
                     {
                         //if enter was pressed, return to the sim
                         simState = SimState.Simulation;
                     }
-                    else if (SingleKeyPress(kbState, Keys.Space) || 
-                             SingleControllerPress(gpState, Buttons.Back))
+                    else if (SingleKeyPress(kbState, Keys.Space)/* || 
+                             SingleControllerPress(gpState, Buttons.Back)*/)
                     {
                         //if space was pressed, return to the main menu
                         Reset();

@@ -29,7 +29,7 @@ namespace MakhaNata_Magic
     {
         //Fields:
         private List<PhysicsAgent> seekers;
-        private const int numOfSeekers = 1000;
+        private const int numOfSeekers = 500;
         private Spell currentSpell;
 
         //Constructors:
@@ -111,7 +111,7 @@ namespace MakhaNata_Magic
                         agent.Y = position.Y;
 
                         //Moving the seekers to the right like darts
-                        agent.X += (Globals.SeekerCenter.X / 50);
+                        //agent.X += (Globals.SeekerCenter.X / 50);
                     }
 
                     totalForce += KeepInBounds();

@@ -46,7 +46,7 @@ namespace MakhaNata_Magic
         /// Default constructor for PhysicsAgents
         /// </summary>
         public PhysicsAgent()
-            : base(Globals.GameTextures["Pixel"], new Vectangle(200, 200, 2, 2))
+            : base(Globals.GameTextures["Pixel"], new Vectangle(200, 200, 4, 4))
         {
             mass = 1;
             maxSpeed = 5;
