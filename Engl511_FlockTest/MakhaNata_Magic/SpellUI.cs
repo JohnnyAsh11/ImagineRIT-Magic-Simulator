@@ -128,7 +128,7 @@ namespace MakhaNata_Magic
                 "Yashmi", 
                 yashmiSpellUI, 
                 centerScreen, 
-                300, 
+                200, 
                 select[1], 
                 "Uses your hamrakytes \nto defend you",
                 description[1]);
@@ -138,7 +138,7 @@ namespace MakhaNata_Magic
                 "Hushumi", 
                 hushumiSpellUI, 
                 centerScreen, 
-                550, 
+                350, 
                 select[2], 
                 "Converts your hamrakytes \ninto sharp darts",
                 description[2]);
@@ -148,7 +148,7 @@ namespace MakhaNata_Magic
                 "Jasica", 
                 jasicaSpellUI, 
                 centerScreen, 
-                800, 
+                500, 
                 select[3],
                 "returns most of your \nhamrakytes to you",
                 description[3]);
@@ -158,7 +158,7 @@ namespace MakhaNata_Magic
                 "Yuruq", 
                 yuruqSpellUI, 
                 centerScreen, 
-                1050, 
+                650, 
                 select[4], 
                 "Causes your hamrakytes to \nreach extreme temperatures",
                 description[4]);
@@ -173,14 +173,19 @@ namespace MakhaNata_Magic
         /// <param name="offsetY">the Y offset for printing</param>
         private void DrawArray(string spellName, Texture2D[] textures, Vector2 centerScreen, int offsetY, Color tint, string directions, Color directionTint)
         {
-            int offsetX = -300;
+            int offsetX = -350;
 
             //printing the name of the spell
             Globals.SB.DrawString(
                 Globals.SF,
                 spellName,
-                new Vector2(centerScreen.X - 1200, centerScreen.Y + offsetY + 50),
-                tint);
+                new Vector2(centerScreen.X - 900, centerScreen.Y + offsetY),
+                tint,
+                0.0f,
+                Vector2.Zero,
+                0.6f,
+                SpriteEffects.None,
+                1f);
 
             //looping through the textures
             for (int i = 0; i < textures.Length; i++)
@@ -188,23 +193,23 @@ namespace MakhaNata_Magic
                 //rendering them
                 Globals.SB.Draw(
                     textures[i],
-                    new Vector2(centerScreen.X + offsetX, centerScreen.Y + offsetY),
+                    new Vector2(centerScreen.X + offsetX, centerScreen.Y + offsetY - 15),
                     null,
                     Color.White,
                     0.0f,
                     Vector2.Zero,
-                    0.5f,
+                    0.3f,
                     SpriteEffects.None,
                     0.0f);
 
                 //moving the offset over for the next control of the spell
-                offsetX += 250;
+                offsetX += 200;
             }
 
             Globals.SB.DrawString(
                 Globals.SF,
                 directions,
-                new Vector2(centerScreen.X + 750, centerScreen.Y + offsetY + 100),
+                new Vector2(centerScreen.X + 450, centerScreen.Y + offsetY + 30),
                 directionTint,
                 0.0f,
                 Vector2.Zero,

@@ -26,7 +26,7 @@ namespace MakhaNata_Magic
         private GamePadState prevGPState;
         private SpriteFont simFont;
         private Vector2 centerScreen;
-        private const uint hostCap = 15;
+        private const uint hostCap = 20;
         private byte spellByte;
 
         private SpellUI uiManager;
@@ -212,21 +212,21 @@ namespace MakhaNata_Magic
                     Globals.SB.DrawString(
                         simFont,
                         "Blood Magic Simulator",
-                        new Vector2(centerScreen.X - 1200, centerScreen.Y),
+                        new Vector2(centerScreen.X - 850, centerScreen.Y),
                         Color.Red,
                         0.0f,
                         Vector2.Zero,
-                        1.0f,
+                        0.7f,
                         SpriteEffects.None,
                         0.0f);
                     Globals.SB.DrawString(
                         simFont,
                         "Press A to begin",
-                        new Vector2(centerScreen.X - 600, centerScreen.Y + 200),
+                        new Vector2(centerScreen.X - 500, centerScreen.Y + 150),
                         Color.DarkOrchid,
                         0.0f,
                         Vector2.Zero,
-                        0.8f,
+                        0.6f,
                         SpriteEffects.None,
                         0.0f);
 
@@ -243,22 +243,22 @@ namespace MakhaNata_Magic
                     //Drawing the UI elements for the Simulation state
                     Globals.SB.Draw(
                         Globals.GameTextures["StartButton"],
-                        new Vector2(centerScreen.X - 540, Globals.Graphics.GraphicsDevice.Viewport.Height - 200),
+                        new Vector2(centerScreen.X - 175, Globals.Graphics.GraphicsDevice.Viewport.Height - 115),
                         null,
                         Color.White,
                         0.0f,
                         Vector2.Zero,
-                        0.5f,
+                        0.2f,
                         SpriteEffects.None,
                         1f);
                     Globals.SB.DrawString(
                         simFont,
                         "Press     to pick spells",
-                        new Vector2(centerScreen.X - 1100, Globals.Graphics.GraphicsDevice.Viewport.Height - 175),
+                        new Vector2(centerScreen.X - 400, Globals.Graphics.GraphicsDevice.Viewport.Height - 100),
                         Color.DarkOrchid,
                         0.0f,
                         Vector2.Zero,
-                        1.0f,
+                        0.4f,
                         SpriteEffects.None,
                         0.0f);
 

@@ -108,12 +108,20 @@ namespace MakhaNata_Magic
                     //looping through the Host's Seekers
                     foreach (PhysicsAgent agent in seekers)
                     {
-                        agent.Y = position.Y;
+                        if (agent.Y > position.Y + 5)
+                        {
+                            agent.Y -= 5;
+                        }
+                        else if (agent.Y < position.Y - 5)
+                        {
+                            agent.Y += 5;
+                        }
 
                         //Moving the seekers to the right like darts
                         //agent.X += (Globals.SeekerCenter.X / 50);
                     }
 
+                    totalForce += Wander(6, 2) * 1.5f;
                     totalForce += KeepInBounds();
 
                     break;
