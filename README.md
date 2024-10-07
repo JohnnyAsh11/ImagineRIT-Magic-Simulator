@@ -1,1 +1,1 @@
-# Amoeba
+# Magic Simulator
